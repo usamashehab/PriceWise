@@ -1,0 +1,62 @@
+# models
+from django.db import models
+
+from django.contrib.postgres.search import SearchVectorField, SearchVector
+from django.contrib.postgres.indexes import GinIndex
+# utils
+from django.utils.translation import gettext_lazy as _
+
+
+class Product(models.Model):
+    title = models.CharField(max_length=255)
+    url = models.URLField()
+    description = models.TextField()
+    Brand = models.CharField(_(""), max_length=50)
+    weight = models.FloatField()
+    vendor = models.ForeignKey("product.Vendor", on_delete=models.CASCADE)
+    category = models.ForeignKey("product.Category", on_delete=models.CASCADE)
+    available = models.BooleanField(default=True)
+
+    search_vector = SearchVectorField(null=True, blank=True)
+
+    class Meta(object):
+        indexes = [GinIndex(fields=['search_vector'])]
+
+    def save(self, *args, **kwargs):
+        """
+        save twice when create new product because at the first time
+        search_vector won't update tell there is a save values for the 
+        fields title and description
+        """
+
+        if self.pk:
+            super().save(*args, **kwargs)
+            self.search_vector = SearchVector(
+                'title', 'description')
+        super().save(*args, **kwargs)
+
+
+class Price(models.Model):
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='price_history')
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    sale_price = models.DecimalField(
+        max_digits=8, decimal_places=2, null=True, blank=True)
+    date = models.DateField()
+
+    class Meta:
+        ordering = ['-date']
+
+
+class Image(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    image_url = models.URLField()
+    alt = models.CharField(max_length=255, null=True, blank=True)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ('order',)
+        unique_together = ('product', 'order')
+
+    def __str__(self):
+        return self.alt
