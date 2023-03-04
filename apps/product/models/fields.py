@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class MainField(models.Model):
+class MainFields(models.Model):
     model = models.CharField(max_length=255)
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE)
 
