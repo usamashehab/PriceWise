@@ -47,5 +47,3 @@ class Price(models.Model):
 
     class Meta:
         ordering = ['-date']
-
-
