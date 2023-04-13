@@ -8,14 +8,17 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Product(models.Model):
+    # (universal product code)
+    upc = models.CharField(max_length=20)
     title = models.CharField(max_length=255)
     url = models.URLField()
+    image_url = models.URLField()
     description = models.TextField()
     Brand = models.CharField(_(""), max_length=50)
-    weight = models.FloatField()
     vendor = models.ForeignKey("product.Vendor", on_delete=models.CASCADE)
     category = models.ForeignKey("product.Category", on_delete=models.CASCADE)
     available = models.BooleanField(default=True)
+    current_price = models.DecimalField(max_digits=8, decimal_places=2)
 
     search_vector = SearchVectorField(null=True, blank=True)
 
@@ -40,23 +43,9 @@ class Price(models.Model):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='price_history')
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    sale_price = models.DecimalField(
-        max_digits=8, decimal_places=2, null=True, blank=True)
-    date = models.DateField()
+    date = models.DateField(auto_now_add=True)
 
     class Meta:
         ordering = ['-date']
 
 
-class Image(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    image_url = models.URLField()
-    alt = models.CharField(max_length=255, null=True, blank=True)
-    order = models.IntegerField(default=0)
-
-    class Meta:
-        ordering = ('order',)
-        unique_together = ('product', 'order')
-
-    def __str__(self):
-        return self.alt
