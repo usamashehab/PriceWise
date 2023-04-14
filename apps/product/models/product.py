@@ -1,6 +1,6 @@
 # models
 from django.db import models
-
+from datetime import date
 from django.contrib.postgres.search import SearchVectorField, SearchVector
 from django.contrib.postgres.indexes import GinIndex
 # utils
@@ -11,16 +11,19 @@ class Product(models.Model):
     title = models.CharField(max_length=255)
     url = models.URLField()
     description = models.TextField()
-    Brand = models.CharField(_(""), max_length=50)
-    weight = models.FloatField()
+    brand = models.CharField(_(""), max_length=50)
     vendor = models.ForeignKey("product.Vendor", on_delete=models.CASCADE)
     category = models.ForeignKey("product.Category", on_delete=models.CASCADE)
     available = models.BooleanField(default=True)
-
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    sale_price = models.DecimalField(
+        max_digits=8, decimal_places=2, null=True, blank=True)
+    uid = models.CharField(max_length=255)
     search_vector = SearchVectorField(null=True, blank=True)
 
     class Meta(object):
         indexes = [GinIndex(fields=['search_vector'])]
+        unique_together = ('vendor', 'uid')
 
     def save(self, *args, **kwargs):
         """
@@ -40,9 +43,7 @@ class Price(models.Model):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='price_history')
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    sale_price = models.DecimalField(
-        max_digits=8, decimal_places=2, null=True, blank=True)
-    date = models.DateField()
+    date = models.DateField(default=date.today)
 
     class Meta:
         ordering = ['-date']
