@@ -2,14 +2,14 @@
 from django.db import models
 
 from django.contrib.postgres.search import SearchVectorField, SearchVector
-from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.indexes import GinIndex, BTreeIndex
 # utils
 from django.utils.translation import gettext_lazy as _
 
 
 class Product(models.Model):
     # (universal product code)
-    upc = models.CharField(max_length=20)
+    upc = models.CharField(max_length=20, null=False, unique=True, )
     title = models.CharField(max_length=255)
     url = models.URLField()
     image_url = models.URLField()
@@ -19,11 +19,13 @@ class Product(models.Model):
     category = models.ForeignKey("product.Category", on_delete=models.CASCADE)
     available = models.BooleanField(default=True)
     current_price = models.DecimalField(max_digits=8, decimal_places=2)
+    sale_price = models.DecimalField(max_digits=8, decimal_places=2)
 
     search_vector = SearchVectorField(null=True, blank=True)
 
     class Meta(object):
-        indexes = [GinIndex(fields=['search_vector'])]
+        indexes = [GinIndex(fields=['search_vector']),
+                   BTreeIndex(fields=['upc'])]
 
     def save(self, *args, **kwargs):
         """
