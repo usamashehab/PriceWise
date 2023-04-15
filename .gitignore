@@ -5,8 +5,8 @@
 __pycache__
 db.sqlite3
 media
-
-
+# Ignore staticfiles directory
+staticfiles/
 # docker #
 docker-compose.yml
 Dockerfile

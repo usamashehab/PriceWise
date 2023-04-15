@@ -1,31 +1,39 @@
 # models
 from django.db import models
-
+from datetime import date
 from django.contrib.postgres.search import SearchVectorField, SearchVector
 from django.contrib.postgres.indexes import GinIndex, BTreeIndex
 # utils
-from django.utils.translation import gettext_lazy as _
+from django.utils.text import slugify
+# from django.utils.translation import gettext_lazy as _
 
 
 class Product(models.Model):
-    # (universal product code)
-    upc = models.CharField(max_length=20, null=False, unique=True, )
+    # (universal id)
+    uid = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
     url = models.URLField()
-    image_url = models.URLField()
     description = models.TextField()
-    Brand = models.CharField(_(""), max_length=50)
-    vendor = models.ForeignKey("product.Vendor", on_delete=models.CASCADE)
-    category = models.ForeignKey("product.Category", on_delete=models.CASCADE)
+    slug = models.SlugField(max_length=255, unique=True, null=True, blank=True)
+    brand = models.CharField(max_length=50)
     available = models.BooleanField(default=True)
-    current_price = models.DecimalField(max_digits=8, decimal_places=2)
-    sale_price = models.DecimalField(max_digits=8, decimal_places=2)
-
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    sale_price = models.DecimalField(
+        max_digits=8, decimal_places=2, null=True, blank=True)
     search_vector = SearchVectorField(null=True, blank=True)
-
+    vendor = models.ForeignKey(
+        "product.Vendor",
+        on_delete=models.CASCADE,
+        related_name='products',
+    )
+    category = models.ForeignKey(
+        "product.Category",
+        on_delete=models.CASCADE,
+        related_name='products',
+    )
     class Meta(object):
-        indexes = [GinIndex(fields=['search_vector']),
-                   BTreeIndex(fields=['upc'])]
+        indexes = [GinIndex(fields=['search_vector'])]
+        unique_together = ('vendor', 'uid')
 
     def save(self, *args, **kwargs):
         """
@@ -33,6 +41,7 @@ class Product(models.Model):
         search_vector won't update tell there is a save values for the 
         fields title and description
         """
+        self.slug = slugify(self.title)
 
         if self.pk:
             super().save(*args, **kwargs)
@@ -40,12 +49,29 @@ class Product(models.Model):
                 'title', 'description')
         super().save(*args, **kwargs)
 
+    def __str__(self) -> str:
+        return self.title or "empty title"
+
 
 class Price(models.Model):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='price_history')
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(default=date.today)
 
     class Meta:
         ordering = ['-date']
+
+
+class Image(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    image_url = models.URLField()
+    alt = models.CharField(max_length=255, null=True, blank=True)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ('order',)
+        unique_together = ('product', 'order')
+
+    def __str__(self):
+        return self.alt or "empty alt"
