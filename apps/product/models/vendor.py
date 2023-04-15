@@ -8,4 +8,8 @@ class Vendor(models.Model):
         JUMIA = 'Jumia', 'Jumia'
         NOON = 'Noon', 'Noon'
 
-    name = models.CharField(max_length=255, choices=VendorNames.choices)
+    name = models.CharField(
+        max_length=255, choices=VendorNames.choices, null=False, blank=False)
+
+    def __str__(self) -> str:
+        return self.name or 'empty name'

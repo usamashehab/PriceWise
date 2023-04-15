@@ -4,16 +4,24 @@ from datetime import date
 from django.contrib.postgres.search import SearchVectorField, SearchVector
 from django.contrib.postgres.indexes import GinIndex
 # utils
-from django.utils.translation import gettext_lazy as _
+# from django.utils.translation import gettext_lazy as _
 
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
     url = models.URLField()
     description = models.TextField()
-    brand = models.CharField(_(""), max_length=50)
-    vendor = models.ForeignKey("product.Vendor", on_delete=models.CASCADE)
-    category = models.ForeignKey("product.Category", on_delete=models.CASCADE)
+    brand = models.CharField(max_length=50)
+    vendor = models.ForeignKey(
+        "product.Vendor",
+        on_delete=models.CASCADE,
+        related_name='products',
+    )
+    category = models.ForeignKey(
+        "product.Category",
+        on_delete=models.CASCADE,
+        related_name='products',
+    )
     available = models.BooleanField(default=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
     sale_price = models.DecimalField(
@@ -38,6 +46,9 @@ class Product(models.Model):
                 'title', 'description')
         super().save(*args, **kwargs)
 
+    def __str__(self) -> str:
+        return self.title or "empty title"
+
 
 class Price(models.Model):
     product = models.ForeignKey(
@@ -60,4 +71,4 @@ class Image(models.Model):
         unique_together = ('product', 'order')
 
     def __str__(self):
-        return self.alt
+        return self.alt or "empty alt"
