@@ -3,10 +3,12 @@ from rest_framework import serializers
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
 from ..models import Product
 from django.db.models import F, Q
+from ..serializers import ProductSerializer
 
 
 class SearchSerializer(serializers.Serializer):
-    search = serializers.CharField()
+    search = serializers.CharField(write_only=True)
+    products = ProductSerializer(many=True, read_only=True)
 
     def validate(self, attrs):
         search = attrs.pop('search', None)
