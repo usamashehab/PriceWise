@@ -4,7 +4,7 @@ from .fields import *
 
 class Mobile(MainFields,
              OperatingSystem,
-             ConnectivityTech,
+             Connectivity,
              GeneralStorage):
     screen_size = models.DecimalField(max_digits=3, decimal_places=1)
 

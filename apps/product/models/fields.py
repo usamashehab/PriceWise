@@ -16,7 +16,7 @@ class OperatingSystem(models.Model):
     class Meta:
         abstract = True
 
-class ConnectivityTech(models.Model):
+class Connectivity(models.Model):
     connectivity_tech = models.CharField(max_length=50, null=True, blank=True)
     class Meta:
         abstract = True
