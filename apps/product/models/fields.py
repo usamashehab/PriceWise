@@ -3,7 +3,6 @@ from django.db import models
 
 class MainFields(models.Model):
     model = models.CharField(max_length=255)
-    brand = models.CharField(max_length=50)
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE)
 
     class Meta:
