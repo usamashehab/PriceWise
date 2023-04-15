@@ -25,32 +25,32 @@ $ pip install -r requirements.txt
 4. create a PostgreSQL database called pricewise for user postgres and add the pg_trgm extension:
    pg_trgm is responisble for enabling fulltext search
 
-1-First, make sure you have PostgreSQL installed and running on your system.
-1-Open a terminal or command prompt and log in to the postgres user:
+   1-First, make sure you have PostgreSQL installed and running on your system.
 
-for linux:
+   2-Open a terminal or command prompt and log in to the postgres user:
 
-```bash
-sudo -u postgres psql
-CREATE DATABASE pricewise;
-\c <DB_NAME>;
-CREATE EXTENSION pg_trgm;
-```
+   for linux:
 
-for windows:
-open psql
+   ```bash
+   sudo -u postgres psql
+   CREATE DATABASE pricewise;
+   \c <DB_NAME>;
+   CREATE EXTENSION pg_trgm;
+   ```
 
-```bash
-psql
-```
+   for windows:
 
-enter you credintals then:
+   ```bash
+   psql
+   ```
 
-```bash
-CREATE DATABASE pricewise;
-\c <DB_NAME>;
-CREATE EXTENSION pg_trgm;
-```
+   enter you credintals then:
+
+   ```bash
+   CREATE DATABASE pricewise;
+   \c <DB_NAME>;
+   CREATE EXTENSION pg_trgm;
+   ```
 
 5. migrate the database
 
