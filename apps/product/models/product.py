@@ -4,6 +4,7 @@ from datetime import date
 from django.contrib.postgres.search import SearchVectorField, SearchVector
 from django.contrib.postgres.indexes import GinIndex
 # utils
+from django.utils.text import slugify
 # from django.utils.translation import gettext_lazy as _
 
 
@@ -11,6 +12,7 @@ class Product(models.Model):
     title = models.CharField(max_length=255)
     url = models.URLField()
     description = models.TextField()
+    slug = models.SlugField(max_length=255, unique=True, null=True, blank=True)
     brand = models.CharField(max_length=50)
     vendor = models.ForeignKey(
         "product.Vendor",
@@ -39,6 +41,7 @@ class Product(models.Model):
         search_vector won't update tell there is a save values for the 
         fields title and description
         """
+        self.slug = slugify(self.title)
 
         if self.pk:
             super().save(*args, **kwargs)

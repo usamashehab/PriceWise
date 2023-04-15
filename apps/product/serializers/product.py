@@ -3,12 +3,12 @@ from ..models import Product
 
 
 class ProductSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Product
         fields = [
             'id',
             'title',
+            'slug',
             'url',
             'description',
             'brand',
@@ -17,6 +17,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'available',
             'price',
             'sale_price',
+
         ]
 
         depth = 1

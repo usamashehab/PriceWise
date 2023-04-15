@@ -10,3 +10,7 @@ class ProductView(viewsets.GenericViewSet,
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
     http_method_names = ['get']
+
+    def get_object(self):
+        slug = self.kwargs.get('slug')
+        return self.queryset.filter(slug=slug).first()
