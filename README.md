@@ -1,5 +1,5 @@
 # PriceWise
- 
+
 ## Installation
 
 To install and run this project locally, follow these steps:
@@ -10,27 +10,56 @@ To install and run this project locally, follow these steps:
 $ git clone https://github.com/usamashehab/PriceWise.git
 ```
 
-
 2. Change into the project directory:
+
 ```bash
 $ cd PriceWise
 ```
 
-
 3. Install the required dependencies:
+
 ```bash
 $ pip install -r requirements.txt
 ```
 
+4. create a PostgreSQL database called pricewise for user postgres and add the pg_trgm extension:
+   pg_trgm is responisble for enabling fulltext search
 
-4. Create the database tables:
+1-First, make sure you have PostgreSQL installed and running on your system.
+1-Open a terminal or command prompt and log in to the postgres user:
+
+for linux:
+
+```bash
+sudo -u postgres psql
+CREATE DATABASE pricewise;
+\c <DB_NAME>;
+CREATE EXTENSION pg_trgm;
+```
+
+for windows:
+open psql
+
+```bash
+psql
+```
+
+enter you credintals then:
+
+```bash
+CREATE DATABASE pricewise;
+\c <DB_NAME>;
+CREATE EXTENSION pg_trgm;
+```
+
+5. migrate the database
+
 ```bash
 $ python manage.py migrate
 ```
 
-
-
 5. Start the development server:
+
 ```bash
 $ python manage.py runserver
 ```
