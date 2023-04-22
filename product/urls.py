@@ -13,5 +13,6 @@ urlpatterns = [
          ProductView.as_view({'get': 'list'}), name='product-list'),
     path('product/<slug:slug>/',
          ProductView.as_view({'get': 'retrieve'}), name='product-detail'),
+
 ]
 urlpatterns += router.urls
