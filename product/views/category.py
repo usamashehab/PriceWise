@@ -3,11 +3,11 @@ from ..serializers import ProductSerializer, CategorySerializer
 
 from ..models import Category
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 
 class CategoryView(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin
                    ):
     serializer_class = ProductSerializer
     queryset = Category.objects.prefetch_related('products').all()
@@ -22,12 +22,14 @@ class CategoryView(viewsets.GenericViewSet,
         slug = self.kwargs.get('slug')
         return self.queryset.filter(slug=slug).first()
 
-    def retrieve(self, request, *args, **kwargs):
+    @action(methods=['get'], detail=True, url_path='category/<slug:slug>/products')
+    def list_products(self, request, *args, **kwargs):
         category = self.get_object()
-        serializer = self.get_serializer(category.products, many=True)
-        return Response(serializer.data)
+        products = category.products.filter(category=category)
+        page = self.paginate_queryset(products)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(category.products, many=True)
         return Response(serializer.data)

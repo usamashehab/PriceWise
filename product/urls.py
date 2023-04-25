@@ -1,6 +1,6 @@
 from rest_framework.decorators import action
 from django.urls import path
-from .views import SearchView, ProductView
+from .views import SearchView, ProductView, CategoryView
 from rest_framework import routers
 
 app_name = 'core'
@@ -13,6 +13,10 @@ urlpatterns = [
          ProductView.as_view({'get': 'list'}), name='product-list'),
     path('product/<slug:slug>/',
          ProductView.as_view({'get': 'retrieve'}), name='product-detail'),
+    path('category/<slug:slug>/products/',
+         CategoryView.as_view({'get': 'list_products'}), name='category-products'),
+    path('category/list/',
+         CategoryView.as_view({'get': 'list'}), name='category-list'),
 
 ]
 urlpatterns += router.urls
