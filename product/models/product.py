@@ -29,7 +29,8 @@ class ProductManager(models.Manager):
         product, created = Product.objects.get_or_create(
             uid=uid, vendor=vendor, defaults=kwargs)
 
-        if not created:
+        if not created:\
+
             new_price = Decimal(kwargs.get('price'))
             new_sale_price = kwargs.get('sale_price')
 
@@ -48,7 +49,7 @@ class ProductManager(models.Manager):
                     date=date.today()
                 )
 
-        return product
+        return product, created
 
 
 class Product(models.Model):
@@ -82,19 +83,14 @@ class Product(models.Model):
         indexes = [GinIndex(fields=['search_vector'])]
         unique_together = ('vendor', 'uid')
 
-    def save(self, *args, **kwargs):
-        """
-        save twice when create new product because at the first time
-        search_vector won't update tell there is a save values for the 
-        fields title and description
-        """
-        self.slug = slugify(self.title)
-
-        if self.pk:
-            super().save(*args, **kwargs)
-            self.search_vector = SearchVector(
-                'title', 'description', 'brand', 'category__name')
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     """
+    #     save twice when create new product because at the first time
+    #     search_vector won't update tell there is a save values for the
+    #     fields title and description
+    #     """
+    #     self.slug = slugify(self.title)
+    #     super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.title or "empty title"

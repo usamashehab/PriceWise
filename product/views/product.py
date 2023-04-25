@@ -3,7 +3,6 @@ from ..serializers import ProductSerializer
 from ..models import Product, Vendor
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
 from django.db.models import F, Q
-from ..serializers import ProductSerializer
 from rest_framework.response import Response
 
 
