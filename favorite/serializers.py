@@ -1,13 +1,13 @@
 from rest_framework import serializers
 from product.serializers import ProductSerializer
-from .models import Favourite
+from .models import Favorite
 
 
-class FavouriteSerializer(serializers.ModelSerializer):
+class FavoriteSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
 
     class Meta:
-        model = Favourite
+        model = Favorite
         fields = [
             'product',
             'desired_price'

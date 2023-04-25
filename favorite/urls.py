@@ -1,8 +1,8 @@
 from rest_framework.routers import DefaultRouter
-from .views import FavouriteView
+from .views import FavoriteView
 
 
 router = DefaultRouter()
-router.register("favourites", FavouriteView, basename='Favourites')
+router.register("favorites", FavoriteView, basename='Favorites')
 
 urlpatterns = router.urls

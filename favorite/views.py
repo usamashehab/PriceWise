@@ -1,18 +1,20 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
-from .models import Favourite
-from .serializers import FavouriteSerializer
+from .models import Favorite
+from .serializers import FavoriteSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
-class FavouriteView(
+class FavoriteView(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,
     mixins.UpdateModelMixin
 ):
-    queryset = Favourite.objects.all()
-    serializer_class = FavouriteSerializer
+    # permission_classes = (IsAuthenticated,) #TODO: uncomment this line
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializer
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
