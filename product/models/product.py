@@ -7,6 +7,49 @@ from django.contrib.postgres.indexes import GinIndex
 from django.utils.text import slugify
 # from django.utils.translation import gettext_lazy as _
 
+from datetime import date
+from decimal import Decimal
+
+
+class ProductManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'vendor',
+            'category'
+        ).prefetch_related(
+            'price_history',
+            'images'
+        )
+
+    def create_or_update(self, **kwargs):
+        uid = kwargs.pop('uid')
+        vendor = kwargs.pop('vendor')
+
+        product, created = Product.objects.get_or_create(
+            uid=uid, vendor=vendor, defaults=kwargs)
+
+        if not created:
+            new_price = Decimal(kwargs.get('price'))
+            new_sale_price = kwargs.get('sale_price')
+
+            if new_sale_price:
+                new_sale_price = Decimal(new_sale_price)
+
+            # Product exists, update its price and sale_price fields
+            if product.price != new_price or product.sale_price != new_sale_price:
+                old_price = product.price
+                product.price = new_price
+                product.sale_price = new_sale_price
+                product.save()
+                Price.objects.create(
+                    product=product,
+                    price=old_price,
+                    date=date.today()
+                )
+
+        return product
+
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
@@ -29,6 +72,10 @@ class Product(models.Model):
     sale_price = models.DecimalField(
         max_digits=8, decimal_places=2, null=True, blank=True)
     uid = models.CharField(max_length=255)
+    rating = models.DecimalField(
+        max_digits=4, decimal_places=2, default=0.00, null=True, blank=True)
+    views = models.PositiveIntegerField(default=0)
+    reviews = models.PositiveIntegerField(default=0)
     search_vector = SearchVectorField(null=True, blank=True)
 
     class Meta(object):
@@ -46,7 +93,7 @@ class Product(models.Model):
         if self.pk:
             super().save(*args, **kwargs)
             self.search_vector = SearchVector(
-                'title', 'description')
+                'title', 'description', 'brand', 'category__name')
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -64,7 +111,8 @@ class Price(models.Model):
 
 
 class Image(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='images')
     image_url = models.URLField()
     alt = models.CharField(max_length=255, null=True, blank=True)
     order = models.IntegerField(default=0)
