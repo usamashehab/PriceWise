@@ -3,7 +3,7 @@ from django.db import models
 
 class MainFields(models.Model):
     model = models.CharField(max_length=255)
-    product = models.ForeignKey('product.Product', on_delete=models.CASCADE)
+    product = models.OneToOneField('product.Product', on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
@@ -56,30 +56,30 @@ class Display(models.Model):
 
 
 class Processor(models.Model):
-    cpu_brand = models.CharField(max_length=100)
-    cpu_series = models.CharField(max_length=100)
+    cpu_brand = models.CharField(max_length=100, null=True, blank=True)
+    cpu_series = models.CharField(max_length=100, null=True, blank=True)
     # cpu_base_clock_speed = models.DecimalField(
     #     max_digits=5, decimal_places=2)
     # cpu_boost_clock_speed = models.DecimalField(
     #     max_digits=5, decimal_places=2)
-    cpu_num_cores = models.PositiveSmallIntegerField()
-    cpu_num_threads = models.PositiveSmallIntegerField()
+    cpu_num_cores = models.PositiveSmallIntegerField(null=True, blank=True)
+    cpu_num_threads = models.PositiveSmallIntegerField(null=True, blank=True)
     # cpu_socket_type = models.CharField(max_length=100)
     # cpu_tdp = models.PositiveSmallIntegerField(
     #     help_text="Thermal Design Power (TDP) in watts")
-    cpu_cache_memory = models.CharField(max_length=100)
+    cpu_cache_memory = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         abstract = True
 
 
 class Graphics(models.Model):
-    gpu_brand = models.CharField(max_length=100)
-    gpu_model = models.CharField(max_length=100)
+    gpu_brand = models.CharField(max_length=100, null=True, blank=True)
+    gpu_model = models.CharField(max_length=100, null=True, blank=True)
     # gpu_chip = models.CharField(
     #     max_length=100, help_text="The type of GPU chip (e.g. NVIDIA, AMD)")
-    gpu_memory = models.PositiveSmallIntegerField(
-        help_text="The amount of memory on the GPU in GB")
+    gpu_memory = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                  help_text="The amount of memory on the GPU in GB")
     # gpu_memory_type = models.CharField(
     #     max_length=50, help_text="The type of memory used by the GPU (e.g. GDDR5, GDDR6)")
     # gpu_memory_bandwidth = models.CharField(
@@ -98,18 +98,18 @@ class Graphics(models.Model):
 
 
 class Battery(models.Model):
-    battery_capacity = models.CharField(max_length=50)
-    battery_life = models.CharField(max_length=50)
+    battery_capacity = models.CharField(max_length=50, null=True, blank=True)
+    battery_life = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
         abstract = True
 
 
 class StorageRam(models.Model):
-    storage = models.PositiveSmallIntegerField()
-    storage_type = models.CharField(max_length=50)
-    ram = models.PositiveSmallIntegerField()
-    ram_type = models.CharField(max_length=50)
+    storage = models.PositiveSmallIntegerField(null=True, blank=True)
+    storage_type = models.CharField(max_length=50, null=True, blank=True)
+    ram = models.PositiveSmallIntegerField(null=True, blank=True)
+    ram_type = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
         abstract = True
