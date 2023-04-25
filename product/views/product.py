@@ -18,19 +18,22 @@ class ProductView(viewsets.GenericViewSet,
         slug = self.kwargs.get('slug')
         return self.queryset.filter(slug=slug).first()
 
+    # get the product object
     def retrieve(self, request, *args, **kwargs):
         product = self.get_object()
         serializer = self.get_serializer(product)
+        # get all other vendors except current vendor of product
         other_vendors = Vendor.objects.exclude(id=product.vendor.id)
         similar_product_other_vendor = list()
         for vendor in other_vendors:
+            # search for similar product of other vendors
             search_query = SearchQuery(product.title)
             similar_product = vendor.products.annotate(
                 similarity=TrigramSimilarity('title', product.title),
                 rank=SearchRank(F('search_vector'), search_query)
             ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.3)).order_by('-similarity', "-rank", "sale_price", "price").first()
-
-            similar_product_other_vendor.append(similar_product)
+            if similar_product:
+                similar_product_other_vendor.append(similar_product)
 
         similar_products_data = ProductSerializer(
             similar_product_other_vendor,

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from .validators import validate_password_strength
 from .managers import CustomUserManager
+from favourite.models import Favourite
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -11,6 +12,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    favourties = models.ManyToManyField(
+        'product.Product', through=Favourite, related_name='users')
+
     USERNAME_FIELD = 'email'
 
     objects = CustomUserManager()
