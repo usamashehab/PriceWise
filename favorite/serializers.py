@@ -12,3 +12,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
             'product',
             'desired_price'
         ]
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        return Favorite.objects.create(user=user, **validated_data)

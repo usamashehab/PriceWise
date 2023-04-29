@@ -83,14 +83,19 @@ class Product(models.Model):
         indexes = [GinIndex(fields=['search_vector'])]
         unique_together = ('vendor', 'uid')
 
-    # def save(self, *args, **kwargs):
-    #     """
-    #     save twice when create new product because at the first time
-    #     search_vector won't update tell there is a save values for the
-    #     fields title and description
-    #     """
-    #     self.slug = slugify(self.title)
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        """
+        save twice when create new product because at the first time
+        search_vector won't update tell there is a save values for the
+        fields title and description
+        """
+        if not self.pk:
+            super().save(*args, **kwargs)
+            self.search_vector = SearchVector(
+                'title', 'description', 'brand')
+
+        self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.title or "empty title"

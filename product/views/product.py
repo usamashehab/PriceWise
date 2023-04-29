@@ -4,6 +4,7 @@ from ..models import Product, Vendor
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
 from django.db.models import F, Q
 from rest_framework.response import Response
+from ..signals import product_retrieved
 
 
 class ProductView(viewsets.GenericViewSet,
@@ -43,4 +44,6 @@ class ProductView(viewsets.GenericViewSet,
         data = {"product": serializer.data,
                 "similar_products": similar_products_data}
 
+        # send signal
+        product_retrieved.send(sender=Product, instance=product)
         return Response(data)

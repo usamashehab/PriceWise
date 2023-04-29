@@ -6,3 +6,6 @@ class Favorite(models.Model):
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE)
     desired_price = models.DecimalField(max_digits=10, decimal_places=2)
     desired_price_reached = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'product')
