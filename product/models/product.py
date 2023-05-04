@@ -3,13 +3,14 @@ from django.db import models
 from datetime import date
 from django.contrib.postgres.search import SearchVectorField, SearchVector
 from django.contrib.postgres.indexes import GinIndex
+from product.models.category import Category
+from product.models.vendor import Vendor
 # utils
 from django.utils.text import slugify
 # from django.utils.translation import gettext_lazy as _
 
 from datetime import date
 from decimal import Decimal
-
 
 class ProductManager(models.Manager):
 
@@ -24,31 +25,45 @@ class ProductManager(models.Manager):
 
     def create_or_update(self, **kwargs):
         uid = kwargs.pop('uid')
-        vendor = kwargs.pop('vendor')
-
-        product, created = Product.objects.get_or_create(
-            uid=uid, vendor=vendor, defaults=kwargs)
+        category = Category.objects.get(name=kwargs.pop('category'))
+        vendor = Vendor.objects.get(name=kwargs.pop('vendor'))
+        try:
+            kwargs.pop('is_product')
+        except KeyError:
+            pass
+        #  should pass Category and Vendor as An object
+        product, created = Product.objects.get_or_create(uid=uid,
+                                                        vendor=vendor, category=category,
+                                                        defaults=kwargs)
 
         if not created:
-            new_price = Decimal(kwargs.get('price'))
-            new_sale_price = kwargs.get('sale_price')
-
-            if new_sale_price:
-                new_sale_price = Decimal(new_sale_price)
+            new_price = Decimal(kwargs.get('price')) if kwargs.get('price') is not None else None 
+            new_sale_price = Decimal(kwargs.get('sale_price')) if kwargs.get('sale_price') is not None else None
 
             # Product exists, update its price and sale_price fields
             if product.price != new_price or product.sale_price != new_sale_price:
                 old_price = product.price
+                old_sale_price = product.sale_price
                 product.price = new_price
                 product.sale_price = new_sale_price
                 product.save()
-                Price.objects.create(
+                Price.objects.get_or_create(
                     product=product,
-                    price=old_price,
+                    price=old_sale_price if old_sale_price is not None else old_price,
                     date=date.today()
                 )
-
-        return product
+        else:
+            price = Decimal(kwargs.get('sale_price')) if kwargs.get('sale_price') is not None \
+                else Decimal(kwargs.get('price')) if kwargs.get('price') is not None \
+                else None
+            price_history, created = Price.objects.get_or_create(
+                product=product,
+                price=price,
+                date=date.today()
+            )
+            if created:
+                price_history.save()
+        return product, created
 
 
 class Product(models.Model):
@@ -78,6 +93,7 @@ class Product(models.Model):
     reviews = models.PositiveIntegerField(default=0)
     search_vector = SearchVectorField(null=True, blank=True)
 
+    objects = ProductManager()
     class Meta(object):
         indexes = [GinIndex(fields=['search_vector'])]
         unique_together = ('vendor', 'uid')

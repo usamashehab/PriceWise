@@ -1,6 +1,7 @@
 from scrapy_djangoitem import DjangoItem
 from product.models.core import Mobile, TV, Laptop 
 from w3lib.html import remove_tags
+import requests
 import re
 
 def get_price(price_tag):
@@ -47,37 +48,6 @@ def get_product_images(imags_links_list):
     """
     return re.findall(r'I\/(.*?)\.', ''.join(imags_links_list))
 
-def get_brands(brand_tags):
-    """
-    Transforms a list of tags to just the list of brands
-    
-    args:
-    brand_tags: list of string
-    
-    Returns:
-    list"""
-    brands=[]
-    for brand in brand_tags:
-        brands.append(remove_tags(brand).replace('\n','').replace(' ',''))
-    return brands
-
-def fetch_brand(title, brand_list):
-    """
-    Extracts product brand from its title
-    
-    args:
-    title: product title str
-    brand_list: str list 
-    
-    Returns:
-    str
-    """
-    for brand in brand_list:
-        if brand.lower() in title.lower():
-            return brand
-        else:
-            return None
-
 features = {
     'Mobile': ['Model name','Operating system', 'Memory storage capacity', 'Screen size', 'RAM', 'Connectivity technology'],
     'Laptop': ['Model name', 'Standing screen display size', 'Resolution', \
@@ -105,7 +75,7 @@ def handle_product_variations(func):
         filtered_result = {k: v for k, v in result_dict.items() if k in features_list}
         filtered_result = prepare_item(filtered_result, category)
         filtered_result['images_ids'] = result['images_ids']
-        # filtered_result['id'] = result['product_id']        
+        filtered_result['uid'] = result['uid']        
         return filtered_result
     return wrapper
 

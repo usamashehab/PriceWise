@@ -7,11 +7,10 @@ from ..items import (
     get_price,
     get_product_details,
     get_product_images,
-    get_brands,
-    fetch_brand,
     )
+from twisted.internet import defer
 
-API_KEY = '17ac39eb-1278-4af9-9205-73eeab7112e1'
+API_KEY = '21c5db36-8ed8-4028-bfd6-3b841ff83bbe'
 
 def get_scrapeops_url(url):
     scrape_ops_url = 'https://proxy.scrapeops.io/v1/?'
@@ -44,23 +43,26 @@ class AmazonSpSpider(scrapy.Spider):
 
     # parse the products page
     def parse_page(self, response, category):
-        brands = get_brands(response.css('#brandsRefinements .a-spacing-micro').getall())
         for card in response.css('.s-card-border'):
             item = {}
             product_link = card.css('.s-line-clamp-4 a::attr(href)').get()
+            product_link = 'https://www.amazon.eg'+ product_link
             id = re.search(r'B0\w{8}', product_link).group(0)
             price_string = card.css('.a-row.a-color-base').get()
             item['uid'] = id
             item['sale_price'], item['price'] = get_price(price_string)
-            item['url'] = 'https://www.amazon.eg/'+ product_link
+            if item['price'] is None:
+                continue
+            item['url'] = 'https://www.amazon.eg/dp/'+ id
             item['title'] = card.css('.a-size-base-plus::text').get()
-            item['brand'] = fetch_brand(item['title'], brands)
+            item['brand'] = 'Brand'
+            item['description'] = 'Description'
             item['available'] = True if card.css('.a-price-whole::text').get() else False
             item['category'] = category
             item['vendor'] = 'Amazon'
             item['is_product']=True
             yield item
-            yield scrapy.Request(url=get_scrapeops_url(item['url']), callback=self.parse_product_data, cb_kwargs={'category':category, 'id':  id})
+            yield scrapy.Request(url=get_scrapeops_url(product_link), callback=self.parse_product_data, cb_kwargs={'category':category, 'id':  id})
 
     # parses a product page
     @handle_product_variations 
@@ -70,6 +72,7 @@ class AmazonSpSpider(scrapy.Spider):
         title = response.css('#productTitle::text').get().strip()
         description = response.css('#productDetails_techSpec_section_1 .a-size-base ::text')
         item = {
+            'uid': kwargs.get('id'),
             'category': kwargs.get('category'),
             'title' : title,
             'about_details': about_details,

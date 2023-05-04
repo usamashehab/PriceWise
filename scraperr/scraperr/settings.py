@@ -42,7 +42,7 @@ ROBOTSTXT_OBEY = True
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 4
+DOWNLOAD_DELAY = 5
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
@@ -56,32 +56,33 @@ DOWNLOAD_DELAY = 4
 #TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-#DEFAULT_REQUEST_HEADERS = {
-#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-#   'Accept-Language': 'en',
-#}
-# PROXY_POOL_ENABLED = True
-# DOWNLOADER_MIDDLEWARES = {
-#     # ...
-#     'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 630,
-#     'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620,
-#     # ...
-# }
-
+DEFAULT_REQUEST_HEADERS = {
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'en',
+}
+PROXY_POOL_ENABLED = True
 DOWNLOADER_MIDDLEWARES = {
-    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 543,
-    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
+    # ...
+    'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 630,
+    'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620,
+    # ...
 }
 
-PROXY_POOL_ENABLED = True
-PROXY_POOL_RETRY_TIMES = 10
+# DOWNLOADER_MIDDLEWARES = {
+#     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 543,
+#     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
+# }
+
+# PROXY_POOL_ENABLED = True
+# PROXY_POOL_RETRY_TIMES = 10
 
 
-DOWNLOADER_MIDDLEWARES.update({
+DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
     'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-})
-
+    'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+}
 # specify the list of user agents to choose from
 USER_AGENT_LIST = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299',
@@ -90,6 +91,13 @@ USER_AGENT_LIST = [
     'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
 ]
+FAKEUSERAGENT_PROVIDERS = [
+    'scrapy_fake_useragent.providers.FakeUserAgentProvider',  # This is the first provider we'll try
+    'scrapy_fake_useragent.providers.FakerProvider',  # If FakeUserAgentProvider fails, we'll use faker to generate a user-agent string for us
+    'scrapy_fake_useragent.providers.FixedUserAgentProvider',  # Fall back to USER_AGENT value
+]
+    
+
 
 # set the user agent to a random value from the list for each request
 RANDOM_UA_PER_REQUEST = True
@@ -109,14 +117,14 @@ RANDOM_UA_PER_REQUEST = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'scraperr.pipelines.ProductPipeline': 300,
+    'scraperr.pipelines.ProductPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
 AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-AUTOTHROTTLE_START_DELAY = 10
+AUTOTHROTTLE_START_DELAY = 15
 # The maximum download delay to be set in case of high latencies
 #AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to
