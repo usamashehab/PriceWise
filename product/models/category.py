@@ -16,7 +16,7 @@ def categor_image_path(instance, filename):
 
     ext = filename.split(".")[-1]
     filename = "%s.%s" % (uuid4(), ext)
-    return "user/taxi_license/{0}".format(filename)
+    return "category/images/{0}".format(filename)
 
 
 class Category(models.Model):

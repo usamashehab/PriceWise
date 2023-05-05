@@ -18,6 +18,10 @@ class FavoriteView(
     # permission_classes = (IsAuthenticated,)  # TODO: uncomment this line
     http_method_names = ['get', 'post', 'delete', 'patch']
 
+    def get_queryset(self):
+        user = self.request.user
+        return Favorite.objects.filter(user=user)
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(
             data=request.data, context={'request': request})

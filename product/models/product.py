@@ -29,7 +29,7 @@ class ProductManager(models.Manager):
         product, created = Product.objects.get_or_create(
             uid=uid, vendor=vendor, defaults=kwargs)
 
-        if not created:\
+        if not created:
 
             new_price = Decimal(kwargs.get('price'))
             new_sale_price = kwargs.get('sale_price')
@@ -82,6 +82,7 @@ class Product(models.Model):
     class Meta(object):
         indexes = [GinIndex(fields=['search_vector'])]
         unique_together = ('vendor', 'uid')
+        ordering = ['-views', '-rating']
 
     def save(self, *args, **kwargs):
         """
@@ -92,7 +93,7 @@ class Product(models.Model):
         if not self.pk:
             super().save(*args, **kwargs)
             self.search_vector = SearchVector(
-                'title', 'description', 'brand')
+                'title', 'description')
 
         self.slug = slugify(self.title)
         super().save(*args, **kwargs)

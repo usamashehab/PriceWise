@@ -9,7 +9,7 @@ class SearchView(viewsets.GenericViewSet):
     queryset = Product.objects.all()
     serializer_class = SearchSerializer
 
-    @action(methods=['post'], detail=False)
+    @action(methods=['post'], detail=False, )
     def search(self, request, format=None):
         serializer = SearchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

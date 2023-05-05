@@ -58,15 +58,8 @@ class Display(models.Model):
 class Processor(models.Model):
     cpu_brand = models.CharField(max_length=100, null=True, blank=True)
     cpu_series = models.CharField(max_length=100, null=True, blank=True)
-    # cpu_base_clock_speed = models.DecimalField(
-    #     max_digits=5, decimal_places=2)
-    # cpu_boost_clock_speed = models.DecimalField(
-    #     max_digits=5, decimal_places=2)
     cpu_num_cores = models.PositiveSmallIntegerField(null=True, blank=True)
     cpu_num_threads = models.PositiveSmallIntegerField(null=True, blank=True)
-    # cpu_socket_type = models.CharField(max_length=100)
-    # cpu_tdp = models.PositiveSmallIntegerField(
-    #     help_text="Thermal Design Power (TDP) in watts")
     cpu_cache_memory = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:

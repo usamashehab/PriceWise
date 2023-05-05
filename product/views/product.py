@@ -25,6 +25,7 @@ class ProductView(viewsets.GenericViewSet,
         serializer = self.get_serializer(product)
         # get all other vendors except current vendor of product
         other_vendors = Vendor.objects.exclude(id=product.vendor.id)
+
         similar_product_other_vendor = list()
         for vendor in other_vendors:
             # search for similar product of other vendors
@@ -32,7 +33,7 @@ class ProductView(viewsets.GenericViewSet,
             similar_product = vendor.products.annotate(
                 similarity=TrigramSimilarity('title', product.title),
                 rank=SearchRank(F('search_vector'), search_query)
-            ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.3)).order_by('-similarity', "-rank", "sale_price", "price").first()
+            ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.1)).order_by('-similarity', "-rank", "sale_price", "price").first()
             if similar_product:
                 similar_product_other_vendor.append(similar_product)
 

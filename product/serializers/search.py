@@ -16,7 +16,7 @@ class SearchSerializer(serializers.Serializer):
         products = Product.objects.annotate(
             similarity=TrigramSimilarity('title', search),
             rank=SearchRank(F('search_vector'), search_query)
-        ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.3)).order_by('-similarity', "-rank")
+        ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.1)).order_by('-similarity', "-rank")
 
         attrs['products'] = products
         return attrs
