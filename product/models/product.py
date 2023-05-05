@@ -27,10 +27,6 @@ class ProductManager(models.Manager):
         uid = kwargs.pop('uid')
         category = Category.objects.get(name=kwargs.pop('category'))
         vendor = Vendor.objects.get(name=kwargs.pop('vendor'))
-        try:
-            kwargs.pop('is_product')
-        except KeyError:
-            pass
         #  should pass Category and Vendor as An object
         product, created = Product.objects.get_or_create(uid=uid,
                                                         vendor=vendor, category=category,
@@ -63,6 +59,7 @@ class ProductManager(models.Manager):
             )
             if created:
                 price_history.save()
+
         return product, created
 
 

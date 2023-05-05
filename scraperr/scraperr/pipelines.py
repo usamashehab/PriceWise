@@ -1,5 +1,4 @@
 from product.models.product import (Product,
-                                    ProductManager,
                                     Image)
 from product.models.core import(Mobile,
                                 Laptop,
@@ -21,35 +20,36 @@ class ProductPipeline:
         # category = Category.objects.get(name='Mobile')
         # vendor = Vendor.objects.get(name=item['vendor'])
         if item['is_product']:
+            item.pop('is_product')
             product, created = Product.objects.create_or_update(**item)
             if not created:
                 # just updated the product price history
                 return product
         else:
-            #  Add the images and details model
-            images = item.pop('images_ids')
+            #  Store Product images
+            item.pop('is_product')
+            vendor = Vendor.objects.get(name=item.pop('vendor'))
+            uid = item.pop('uid')
+            product = Product.objects.get(uid=uid, vendor=vendor)
             model = category_model_map[item.pop('category')]
-            for order, image in enumerate(images):
-                img, created= Image.objects.get_or_create(
+            for order, image in enumerate(item.pop('images_ids')):
+                img, created = Image.objects.get_or_create(
                     product = product,
                     image_url = image,
                     order=order
                 )
                 if created:
                     img.save()
+            # update brand and description for the product
+            try:
+                brand = item.pop('Brand')
+                description = item.pop('description')
+                Product.objects.filter(uid=uid, vendor=vendor).update(brand=brand, description=description)
+            except Product.DoesNotExist:
+                pass
+
+            # Store product details in the related model -->TV, Laptpo etc
             item['product'] = product
             model, created = model.objects.get_or_create(**item)
             if created:
                 model.save()
-            # update brand and description for the product
-            uid = item.pop['uid']
-            vendor = Vendor.objects.get(name=item.pop('vendor'))
-            try:
-                product = Product.objects.get(uid=uid, vendor=vendor)
-                if product.brand != item['Brand']:
-                    product.brand = item['Brand']
-                if product.description != item['description']:
-                    product.description = item['description']
-                product.save()
-            except Product.DoesNotExist:
-                pass

@@ -49,14 +49,15 @@ def get_product_images(imags_links_list):
     return re.findall(r'I\/(.*?)\.', ''.join(imags_links_list))
 
 features = {
-    'Mobile': ['Model name','Operating system', 'Memory storage capacity', 'Screen size', 'RAM', 'Connectivity technology'],
+    'Mobile': ['Model name','Operating system', 'Memory storage capacity', 'Screen size', 'RAM', \
+               'Connectivity technology', 'Brand'],
     'Laptop': ['Model name', 'Standing screen display size', 'Resolution', \
                 'Processor Brand', 'Processor Type', 'Processor Speed', 'Processor Count', \
                 'Hard Disk Description', 'Installed RAM memory size', 'Memory Technology', \
-                'Operating System', 
+                'Operating System', 'Brand'
                 ],
     'TV':['Model name', 'Screen size', 'Display technology', 'Resolution', 'Refresh rate', \
-        'Connectivity technology']
+        'Connectivity technology', 'Brand']
 }
 def handle_product_variations(func):
     def wrapper(*args, **kwargs):
@@ -75,7 +76,11 @@ def handle_product_variations(func):
         filtered_result = {k: v for k, v in result_dict.items() if k in features_list}
         filtered_result = prepare_item(filtered_result, category)
         filtered_result['images_ids'] = result['images_ids']
-        filtered_result['uid'] = result['uid']        
+        filtered_result['uid'] = result['uid']
+        filtered_result['category'] = kwargs['category']
+        filtered_result['description'] = result['description']
+        filtered_result['vendor'] = 'Amazon'
+        filtered_result['is_product'] = False
         return filtered_result
     return wrapper
 

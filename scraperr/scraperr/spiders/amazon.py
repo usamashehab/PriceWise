@@ -70,7 +70,7 @@ class AmazonSpSpider(scrapy.Spider):
         about_details = get_product_details(response.css('#poExpander td ::text').getall())
         technical_details = get_product_details(response.css('#productDetails_techSpec_section_1 .a-size-base ::text').getall())
         title = response.css('#productTitle::text').get().strip()
-        description = response.css('#productDetails_techSpec_section_1 .a-size-base ::text')
+        description = response.css('#productDescription span ::text').get()
         item = {
             'uid': kwargs.get('id'),
             'category': kwargs.get('category'),
