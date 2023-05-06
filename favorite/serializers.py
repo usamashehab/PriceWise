@@ -5,7 +5,7 @@ from product.models import Product
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
+    product = ProductSerializer(read_only=True)
     product_id = serializers.IntegerField(write_only=True)
 
     class Meta:
@@ -13,6 +13,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         fields = [
             'product',
             'desired_price'
+            'product_id'
         ]
 
     def create(self, validated_data):
