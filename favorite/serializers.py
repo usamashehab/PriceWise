@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 from product.serializers import ProductSerializer
 from .models import Favorite
 from product.models import Product
@@ -18,6 +18,9 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         product = validated_data.pop('product_id', None)
-        product = Product.objects.get(id=product)
+        try:
+            product = Product.objects.get(id=product)
+        except Product.DoesNotExist:
+            raise exceptions.ValidationError("No product with this id")
         user = self.context['request'].user
         return Favorite.objects.create(user=user, product=product ** validated_data)
