@@ -24,6 +24,7 @@ AUTH_USER_MODEL = "user.User"
 
 ALLOWED_HOSTS = [
     "localhost",
+    "localhost:3000",
     "127.0.0.1"
 ]
 
