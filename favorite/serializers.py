@@ -12,7 +12,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         model = Favorite
         fields = [
             'product',
-            'desired_price'
+            'desired_price',
             'product_id'
         ]
 
