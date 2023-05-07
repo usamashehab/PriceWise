@@ -48,9 +48,24 @@ def get_product_images(imags_links_list):
     """
     return re.findall(r'I\/(.*?)\.', ''.join(imags_links_list))
 
+def get_description(description):
+    """
+    Takes care of either the description is a list, string or None
+    
+    args: list of strigs
+    Returns: str
+    """
+    if description is None:
+        return 'No Description'
+    elif isinstance(description, list):
+        return ' '.join(description)
+    else:
+        return description
+
+
 features = {
-    'Mobile': ['Model name','Operating system', 'Memory storage capacity', 'Screen size', 'RAM', \
-               'Connectivity technology', 'Brand'],
+    'Mobile': ['Model name','Operating system', 'Memory storage capacity', 'Screen size', 'Installed RAM memory size', 'RAM', \
+               'Connectivity technology', 'Wireless network technology', 'Brand'],
     'Laptop': ['Model name', 'Standing screen display size', 'Resolution', \
                 'Processor Brand', 'Processor Type', 'Processor Speed', 'Processor Count', \
                 'Hard Disk Description', 'Installed RAM memory size', 'Memory Technology', \
@@ -59,6 +74,11 @@ features = {
     'TV':['Model name', 'Screen size', 'Display technology', 'Resolution', 'Refresh rate', \
         'Connectivity technology', 'Brand']
 }
+numeric_values = [
+    'Memory storage capacity', 'Screen size', 'RAM', 'Processor Speed', 'Processor Count', \
+    'Installed RAM memory size', 'Standing screen display size', 'Resolution', 'Refresh rate',
+
+]
 def handle_product_variations(func):
     def wrapper(*args, **kwargs):
         result = next(func(*args, **kwargs))
@@ -88,20 +108,24 @@ model_map={
     'Mobile':{
         # MainFields
         'Model name' : 'model',
+        'Brand' : 'brand',
         # Operating system
         'Operating system': 'operating_system',
         'Os': 'operating_system',
         # Connectivity
+        'Wireless network technology' : 'connectivity_tech',
         'Connectivity technology': 'connectivity_tech',
-        # Generak Storage
+        # General Storage
         'Memory storage capacity':'storage',
         'RAM': 'ram',
+        'Installed RAM memory size': 'ram',
         # Display
-        'Screen size': 'screen_szie'
+        'Screen size': 'display_size'
         },
     'Laptop':{
         # MainFields
         'Model name' : 'model',
+        'Brand' : 'brand',
         # Operating system
         'Operating system': 'operating_system',
         'Os': 'operating_system',
@@ -124,13 +148,16 @@ model_map={
     'TV': {
         # MainFields
         'Model name' : 'model',
+        'Brand' : 'brand',
         # Connectivity
         'Connectivity technology': 'connectivity_tech',
         # Display
-        'Screen size': 'screen_size',
+        'Screen size': 'display_size',
         'Display technology' : 'display_type',
         'Resolution' : 'display_resolution',
-        'Refresh rate' : 'refresh_rate'
+        'Refresh rate' : 'refresh_rate',
+        # Model Fields
+        'Supported Internet services' : 'smart_tv'
     }
 }
 def prepare_item(item: dict, category: str):

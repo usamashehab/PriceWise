@@ -2,46 +2,38 @@ from django.db import models
 from .fields import (
     MainFields,
     OperatingSystem,
-    Processor,
     Connectivity,
-    Camera,
+    GeneralStorage,
+    Storage,
     Display,
-    Battery,
+    Connectivity,
+    Processor, 
     Graphics,
-    StorageRam,
-    Hdmi
+    Battery
 )
 
 
-class Mobile(MainFields,
-             OperatingSystem,
-             Processor,
-             Connectivity,
-             Camera,
-             Display,
-             Battery,
-             Graphics,
-             StorageRam):
+class Mobile(MainFields, OperatingSystem, Connectivity, GeneralStorage, Display, Battery):
 
     def __str__(self):
         return f"{self.product.brand} {self.model}"
 
 
-class TV(MainFields, OperatingSystem, Connectivity, Display, Graphics, Hdmi):
-    sound = models.CharField(max_length=50, null=True, blank=True)
-    smart_tv = models.BooleanField(default=False)
+class TV(MainFields, Connectivity, Display):
+    smart_tv = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.product.brand} {self.model}"
 
 
-class Laptop(MainFields, OperatingSystem, Processor, Connectivity, Display, Graphics, Hdmi, Battery, StorageRam):
+class Laptop(MainFields, OperatingSystem, Processor, Display, Graphics, Battery, Storage):
 
     def __str__(self):
         return f"{self.product.brand} {self.model}"
 
 
-class Tablet(MainFields, OperatingSystem, Processor, Connectivity, Display, Battery, Graphics, StorageRam):
+
+class Tablet(MainFields, OperatingSystem, Connectivity, Display, Battery, GeneralStorage):
 
     def __str__(self):
         return f"{self.product.brand} {self.model}"

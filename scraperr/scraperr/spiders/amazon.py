@@ -7,15 +7,17 @@ from ..items import (
     get_price,
     get_product_details,
     get_product_images,
+    get_description
     )
 from twisted.internet import defer
 
-API_KEY = '21c5db36-8ed8-4028-bfd6-3b841ff83bbe'
+API_KEY = '466936c8-7e96-4334-9d26-31628a7688b1'
 
 def get_scrapeops_url(url):
-    scrape_ops_url = 'https://proxy.scrapeops.io/v1/?'
-    params = {'api_key': API_KEY, 'url': url}
-    return scrape_ops_url + urlencode(params)
+    # scrape_ops_url = 'https://proxy.scrapeops.io/v1/?'
+    # params = {'api_key': API_KEY, 'url': url}
+    # return scrape_ops_url + urlencode(params)
+    return url
 
 class AmazonSpSpider(scrapy.Spider):
     name = 'amazon'
@@ -25,8 +27,8 @@ class AmazonSpSpider(scrapy.Spider):
     def start_requests(self):
         category = namedtuple('category', ['name', 'url'])
         categories = [
-            # category('Mobile', 'https://www.amazon.eg/-/en/s?i=electronics&bbn=21832883031&rh=n%3A21832883031%2Cp_n_feature_seven_browse-bin%3A27088055031%7C27088056031&dc&fs=true&page={}&language=en&qid=1678985625&rnid=27088044031&ref=sr_pg_2'),
-            category('TV', 'https://www.amazon.eg/s?i=electronics&bbn=21832982031&rh=n%3A21832982031%2Cp_n_feature_eight_browse-bin%3A22080630031%7C22080631031%7C22080632031%7C22080634031&dc&language=en&ds=v1%3ALp9%2BJqkp2zC6tZ%2ByElhAvpF5ldXdJzYEWkFdgAJh1ns&qid=1681759812&rnid=22080628031&ref=sr_nr_p_n_feature_eight_browse-bin_4'),
+            category('Mobile', 'https://www.amazon.eg/-/en/s?i=electronics&bbn=21832883031&rh=n%3A21832883031%2Cp_n_feature_seven_browse-bin%3A27088055031%7C27088056031&dc&fs=true&page={}&language=en&qid=1678985625&rnid=27088044031&ref=sr_pg_2'),
+            # category('TV', 'https://www.amazon.eg/s?i=electronics&bbn=21832982031&rh=n%3A21832982031%2Cp_n_feature_eight_browse-bin%3A22080630031%7C22080631031%7C22080632031%7C22080634031&dc&language=en&ds=v1%3ALp9%2BJqkp2zC6tZ%2ByElhAvpF5ldXdJzYEWkFdgAJh1ns&qid=1681759812&rnid=22080628031&ref=sr_nr_p_n_feature_eight_browse-bin_4'),
             ]
         for cat in categories:
             yield scrapy.Request(url=get_scrapeops_url(cat.url), callback=self.do_pagination, cb_kwargs={'category':cat.name, 'url':cat.url})
@@ -69,8 +71,8 @@ class AmazonSpSpider(scrapy.Spider):
     def parse_product_data(self, response, **kwargs):
         about_details = get_product_details(response.css('#poExpander td ::text').getall())
         technical_details = get_product_details(response.css('#productDetails_techSpec_section_1 .a-size-base ::text').getall())
-        title = response.css('#productTitle::text').get().strip()
-        description = response.css('#productDescription span ::text').get()
+        title = response.css('#productTitle ::text').get(default='No Title').strip()
+        description = get_description(response.css('#productDescription span ::text').getall())
         item = {
             'uid': kwargs.get('id'),
             'category': kwargs.get('category'),

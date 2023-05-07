@@ -40,9 +40,7 @@ class ProductManager(models.Manager):
             if product.price != new_price or product.sale_price != new_sale_price:
                 old_price = product.price
                 old_sale_price = product.sale_price
-                product.price = new_price
-                product.sale_price = new_sale_price
-                product.save()
+                Product.objects.filter(uid=uid, vendor=vendor).update(price=new_price, sale_price=new_sale_price)
                 Price.objects.get_or_create(
                     product=product,
                     price=old_sale_price if old_sale_price is not None else old_price,
@@ -66,9 +64,9 @@ class ProductManager(models.Manager):
 class Product(models.Model):
     title = models.CharField(max_length=255)
     url = models.URLField()
-    description = models.TextField()
+    description = models.TextField(null=True)
     slug = models.SlugField(max_length=255, unique=True, null=True, blank=True)
-    brand = models.CharField(max_length=50)
+    brand = models.CharField(max_length=50, null=True)
     vendor = models.ForeignKey(
         "product.Vendor",
         on_delete=models.CASCADE,
@@ -103,10 +101,10 @@ class Product(models.Model):
         """
         self.slug = slugify(self.title)
 
-        if self.pk:
+        if not self.pk:
             super().save(*args, **kwargs)
             self.search_vector = SearchVector(
-                'title', 'description', 'brand', 'category__name')
+                'title', 'description', 'brand')
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -126,8 +124,8 @@ class Price(models.Model):
 class Image(models.Model):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='images')
-    image_url = models.URLField()
-    alt = models.CharField(max_length=255, null=True, blank=True)
+    image_url = models.CharField(max_length=50)
+    # alt = models.CharField(max_length=255, null=True, blank=True)
     order = models.IntegerField(default=0)
 
     class Meta:
