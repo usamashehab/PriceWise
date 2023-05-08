@@ -99,12 +99,12 @@ class Product(models.Model):
         search_vector won't update tell there is a save values for the 
         fields title and description
         """
-        self.slug = slugify(self.title)
+        self.slug = slugify(self.title) + self.uid
 
-        if not self.pk:
-            super().save(*args, **kwargs)
-            self.search_vector = SearchVector(
-                'title', 'description', 'brand')
+        # if not self.pk:
+        #     super().save(*args, **kwargs)
+        #     if not self.search_vector:
+        #         self.search_vector = SearchVector('title', 'description', 'brand')
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:

@@ -21,6 +21,7 @@ SPIDER_MODULES = ['scraperr.spiders']
 NEWSPIDER_MODULE = 'scraperr.spiders'
 
 LOG_LEVEL = 'DEBUG'
+LOG_FILE = 'scrapy.log'
 
 
 ROBOTSTXT_OBEY = True
@@ -57,46 +58,50 @@ DOWNLOAD_DELAY = 2
 DEFAULT_REQUEST_HEADERS = {
   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
   'Accept-Language': 'en',
+  'accept': '*/*',
+  'accept-encoding': 'gzip, deflate, br', 
+  'accept-language': 'en-US,en;q=0.9',
+  'cookie': 'session-id=260-4273701-4308428; i18n-prefs=EGP; ubid-acbeg=259-8093131-7307554; lc-acbeg=en_AE; session-id-time=2082787201l; session-token=xQcA5bPfPljgDC5khwGaiWa5a+EeM1UUOg+8TSNPcmugbiUVV89YYg7q4gCisw9XtylPsBOMEl9K9Alb+pVvF4ZqXzuKnJSNSeJIQX63T/B9Cpujx9JMd3V/u3xpHzRiCs8i3+U8c/XKlvW36L/0G5KRhDMF6wk6N3jwH0thgClUhweGiO3gPyJ/9NWnfY+7UWaptuyUe3eLZo3juBzgHgjjc7TN07KT6yiDejt/jKo=; csm-hit=tb:s-ACEMZVGHTGZKW120BE3Z|1683569795324&t:1683569796353&adb:adblk_yes',
+  'rtt': '50',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.35',
+  'x-requested-with':' XMLHttpRequest'
 }
 
-PROXY_POOL_ENABLED = True
-DOWNLOADER_MIDDLEWARES = {
-    # ...
-    'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 630,
-    'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620,
-    # ...
-}
+# PROXY_POOL_ENABLED = True
+# DOWNLOADER_MIDDLEWARES = {
+#     # ...
+#     'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 630,
+#     'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620,
+#     # ...
+# }
 
-DOWNLOADER_MIDDLEWARES.update({
-    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 543,
-    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
-})
+# DOWNLOADER_MIDDLEWARES.update({
+#     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 543,
+#     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
+# })
 
 # PROXY_POOL_ENABLED = True
 # PROXY_POOL_RETRY_TIMES = 10
 
 
-DOWNLOADER_MIDDLEWARES = {
-    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-    'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-    'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
-}
+# DOWNLOADER_MIDDLEWARES.update({
+#     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+#     'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+#     'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+#     'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+# })
 # specify the list of user agents to choose from
-USER_AGENT_LIST = [
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299',
-    'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko',
-    'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0',
-    'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
-]
-FAKEUSERAGENT_PROVIDERS = [
-    'scrapy_fake_useragent.providers.FakeUserAgentProvider',  # This is the first provider we'll try
-    'scrapy_fake_useragent.providers.FakerProvider',  # If FakeUserAgentProvider fails, we'll use faker to generate a user-agent string for us
-    'scrapy_fake_useragent.providers.FixedUserAgentProvider',  # Fall back to USER_AGENT value
-]
-    
+# USER_AGENT_LIST = [
+#     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299',
+#     'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko',
+#     'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0',
+#     'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0',
+#     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
+# ]   
 
+## settings.py
+
+USER_AGENT = 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
 
 # set the user agent to a random value from the list for each request
 RANDOM_UA_PER_REQUEST = True

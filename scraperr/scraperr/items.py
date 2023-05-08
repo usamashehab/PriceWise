@@ -58,14 +58,14 @@ def get_description(description):
     if description is None:
         return 'No Description'
     elif isinstance(description, list):
-        return ' '.join(description)
+        return ' '.join(description).strip()
     else:
-        return description
+        return description.strip()
 
 
 features = {
-    'Mobile': ['Model name','Operating system', 'Memory storage capacity', 'Screen size', 'Installed RAM memory size', 'RAM', \
-               'Connectivity technology', 'Wireless network technology', 'Brand'],
+    'Mobile': ['Model name','Operating system', 'OS','Memory storage capacity', 'Screen size', 'Installed RAM memory size', 'RAM', \
+               'Connectivity technology', 'Wireless network technology', 'Connectivity technologies','Brand'],
     'Laptop': ['Model name', 'Standing screen display size', 'Resolution', \
                 'Processor Brand', 'Processor Type', 'Processor Speed', 'Processor Count', \
                 'Hard Disk Description', 'Installed RAM memory size', 'Memory Technology', \
@@ -74,11 +74,8 @@ features = {
     'TV':['Model name', 'Screen size', 'Display technology', 'Resolution', 'Refresh rate', \
         'Connectivity technology', 'Brand']
 }
-numeric_values = [
-    'Memory storage capacity', 'Screen size', 'RAM', 'Processor Speed', 'Processor Count', \
-    'Installed RAM memory size', 'Standing screen display size', 'Resolution', 'Refresh rate',
 
-]
+
 def handle_product_variations(func):
     def wrapper(*args, **kwargs):
         result = next(func(*args, **kwargs))
@@ -111,10 +108,11 @@ model_map={
         'Brand' : 'brand',
         # Operating system
         'Operating system': 'operating_system',
-        'Os': 'operating_system',
+        'OS': 'operating_system',
         # Connectivity
         'Wireless network technology' : 'connectivity_tech',
         'Connectivity technology': 'connectivity_tech',
+        'Connectivity technologies': 'connectivity_tech',
         # General Storage
         'Memory storage capacity':'storage',
         'RAM': 'ram',
@@ -127,14 +125,15 @@ model_map={
         'Model name' : 'model',
         'Brand' : 'brand',
         # Operating system
-        'Operating system': 'operating_system',
-        'Os': 'operating_system',
+        'Operating System': 'operating_system',
+        'OS': 'operating_system',
         # Connectivity
         'Connectivity technology': 'connectivity_tech',
         # Generak Storage
         'Memory storage capacity':'storage',
         'Hard Disk Description':'storage_type',
         'RAM': 'ram',
+        'Installed RAM memory size': 'ram',
         'Memory Technology': 'ram_type',
         # Display
         'Standing screen display size': 'display_size',
