@@ -66,10 +66,11 @@ def get_description(description):
 features = {
     'Mobile': ['Model name','Operating system', 'OS','Memory storage capacity', 'Screen size', 'Installed RAM memory size', 'RAM', \
                'Connectivity technology', 'Wireless network technology', 'Connectivity technologies','Brand'],
-    'Laptop': ['Model name', 'Standing screen display size', 'Resolution', \
+    'Laptop': ['Series', 'Standing screen display size', 'Resolution', \
                 'Processor Brand', 'Processor Type', 'Processor Speed', 'Processor Count', \
                 'Hard Disk Description', 'Installed RAM memory size', 'Memory Technology', \
-                'Operating System', 'Brand'
+                'Graphics Chipset Brand	' , 'Graphics Coprocessor', 'Graphics Card Ram Size	', \
+                'Operating System', 'Lithium Battery Energy Content','Brand'
                 ],
     'TV':['Model name', 'Screen size', 'Display technology', 'Resolution', 'Refresh rate', \
         'Connectivity technology', 'Brand']
@@ -142,11 +143,17 @@ model_map={
         'Processor Brand' : 'cpu_brand',
         'Processor Type':'cpu_type',
         'Processor Speed': 'cpu_speed',
-        'Processor Count' : 'cpu_num_cores'
+        'Processor Count' : 'cpu_num_cores',
+        # Graphics
+        'Graphics Chipset Brand' : 'gpu_brand',
+        'Graphics Coprocessor' : 'gpu_coprocessor',
+        'Graphics Card Ram Size' : 'gpu_meomory',
+        # Battery
+        'Lithium Battery Energy Content' : 'battery_life'
     },
     'TV': {
         # MainFields
-        'Model name' : 'model',
+        'Series' : 'model',
         'Brand' : 'brand',
         # Connectivity
         'Connectivity technology': 'connectivity_tech',

@@ -38,9 +38,7 @@ class Processor(models.Model):
     cpu_brand = models.CharField(max_length=100, null=True)
     cpu_type = models.CharField(max_length=100, null=True)
     cpu_speed = models.CharField(max_length=50, null=True)
-    cpu_num_cores = models.PositiveSmallIntegerField(null=True)
-    cpu_cache_memory = models.CharField(max_length=100, null=True)
-
+    cpu_num_cores = models.CharField(null=True, max_length=10)
     class Meta:
         abstract = True
 
@@ -50,7 +48,7 @@ class Graphics(models.Model):
         max_length=100, help_text="The type of GPU chip (e.g. NVIDIA, AMD)", null=True)
     gpu_coprocessor = models.CharField(
         max_length=100, help_text="The model of a specific type (e.g AMD Radeon Graphics, ..)", null=True)
-    gpu_memory = models.PositiveSmallIntegerField(help_text="The amount of memory on the GPU in GB", null=True)
+    gpu_memory = models.CharField(help_text="The amount of memory on the GPU in GB", null=True, max_length=10)
     
 
     class Meta:
@@ -71,7 +69,7 @@ class GeneralStorage(models.Model):
         abstract = True
 
 class Storage(GeneralStorage):
-    storage_type = models.CharField(max_length=50, null=True)
+    storage_type = models.CharField(max_length=50, null=True, default='HDD')
     ram_type = models.CharField(max_length=50, null=True)
 
     class Meta:
