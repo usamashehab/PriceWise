@@ -27,8 +27,8 @@ class AmazonSpSpider(scrapy.Spider):
     def start_requests(self):
         category = namedtuple('category', ['name', 'url'])
         categories = [
-            # category('Mobile', 'https://www.amazon.eg/-/en/s?i=electronics&bbn=21832883031&rh=n%3A21832883031%2Cp_n_feature_seven_browse-bin%3A27088055031%7C27088056031&dc&fs=true&page={}&language=en&qid=1678985625&rnid=27088044031&ref=sr_pg_2'),
-            # category('TV', 'https://www.amazon.eg/s?i=electronics&bbn=21832982031&rh=n%3A21832982031%2Cp_n_feature_eight_browse-bin%3A22080630031%7C22080631031%7C22080632031%7C22080634031&dc&language=en&ds=v1%3ALp9%2BJqkp2zC6tZ%2ByElhAvpF5ldXdJzYEWkFdgAJh1ns&qid=1681759812&rnid=22080628031&ref=sr_nr_p_n_feature_eight_browse-bin_4'),
+            category('Mobile', 'https://www.amazon.eg/-/en/s?i=electronics&bbn=21832883031&rh=n%3A21832883031%2Cp_n_feature_seven_browse-bin%3A27088055031%7C27088056031&dc&fs=true&page={}&language=en&qid=1678985625&rnid=27088044031&ref=sr_pg_2'),
+            category('TV', 'https://www.amazon.eg/s?i=electronics&bbn=21832982031&rh=n%3A21832982031%2Cp_n_feature_eight_browse-bin%3A22080630031%7C22080631031%7C22080632031%7C22080634031&dc&language=en&ds=v1%3ALp9%2BJqkp2zC6tZ%2ByElhAvpF5ldXdJzYEWkFdgAJh1ns&qid=1681759812&rnid=22080628031&ref=sr_nr_p_n_feature_eight_browse-bin_4'),
             category('Laptop', 'https://www.amazon.eg/-/en/s?i=electronics&bbn=21832907031&rh=n%3A18018102031%2Cn%3A21832872031%2Cn%3A21832907031&dc&fs=true&language=en&qid=1683572938&ref=sr_pg_1')
             ]
         for cat in categories:

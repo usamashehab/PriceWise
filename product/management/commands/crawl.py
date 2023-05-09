@@ -13,7 +13,7 @@ class Command(BaseCommand):
         # Set the logging level for the Scrapy spider
         process = CrawlerProcess(settings={
             'LOG_LEVEL': 'DEBUG',
-            'LOG_FILE': 'scrapy.log',
+            # 'LOG_FILE': 'scrapy.log',
             'DEFAULT_REQUEST_HEADERS' : {
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Accept-Language': 'en',
@@ -26,7 +26,7 @@ class Command(BaseCommand):
                 'x-requested-with':' XMLHttpRequest'
                 },
             'ITEM_PIPELINES' : {
-                'scraperr.pipelines.ProductPipeline': 300,
+                'scraperr.scraperr.pipelines.ProductPipeline': 300,
                 },
             'AUTOTHROTTLE_ENABLED' : True
         })

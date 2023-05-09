@@ -69,7 +69,7 @@ features = {
     'Laptop': ['Series', 'Standing screen display size', 'Resolution', \
                 'Processor Brand', 'Processor Type', 'Processor Speed', 'Processor Count', \
                 'Hard Disk Description', 'Installed RAM memory size', 'Memory Technology', \
-                'Graphics Chipset Brand	' , 'Graphics Coprocessor', 'Graphics Card Ram Size	', \
+                'Graphics Chipset Brand' , 'Graphics Coprocessor', 'Graphics Card Ram Size', \
                 'Operating System', 'Lithium Battery Energy Content','Brand'
                 ],
     'TV':['Model name', 'Screen size', 'Display technology', 'Resolution', 'Refresh rate', \
@@ -123,7 +123,7 @@ model_map={
         },
     'Laptop':{
         # MainFields
-        'Model name' : 'model',
+        'Series' : 'model',
         'Brand' : 'brand',
         # Operating system
         'Operating System': 'operating_system',
@@ -147,13 +147,13 @@ model_map={
         # Graphics
         'Graphics Chipset Brand' : 'gpu_brand',
         'Graphics Coprocessor' : 'gpu_coprocessor',
-        'Graphics Card Ram Size' : 'gpu_meomory',
+        'Graphics Card Ram Size' : 'gpu_memory',
         # Battery
         'Lithium Battery Energy Content' : 'battery_life'
     },
     'TV': {
         # MainFields
-        'Series' : 'model',
+        'Model name': 'model',
         'Brand' : 'brand',
         # Connectivity
         'Connectivity technology': 'connectivity_tech',
