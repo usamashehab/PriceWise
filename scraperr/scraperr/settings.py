@@ -21,7 +21,7 @@ SPIDER_MODULES = ['scraperr.spiders']
 NEWSPIDER_MODULE = 'scraperr.spiders'
 
 LOG_LEVEL = 'DEBUG'
-LOG_FILE = 'scrapy.log'
+# LOG_FILE = 'scrapy.log'
 
 
 ROBOTSTXT_OBEY = True

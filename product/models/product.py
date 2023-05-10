@@ -102,11 +102,12 @@ class Product(models.Model):
         """
         self.slug = slugify(self.title) + self.uid
 
-        # if not self.pk:
-        #     super().save(*args, **kwargs)
-        #     if not self.search_vector:
-        #         self.search_vector = SearchVector('title', 'description', 'brand')
-        super().save(*args, **kwargs)
+        if not self.pk:
+            super().save(*args, **kwargs)
+            # if not self.search_vector:
+            self.search_vector = SearchVector('title')
+            return self.save()
+        super(Product, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.title or "empty title"

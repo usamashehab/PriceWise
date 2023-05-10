@@ -13,10 +13,14 @@ class SearchSerializer(serializers.Serializer):
     def validate(self, attrs):
         search = attrs.pop('search', None)
         search_query = SearchQuery(search)
+        # products = Product.objects.annotate(
+        #     similarity=TrigramSimilarity('title', search),
+        #     rank=SearchRank(F('search_vector'), search_query)
+        # ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.1)).order_by('-similarity', "-rank")
         products = Product.objects.annotate(
             similarity=TrigramSimilarity('title', search),
             rank=SearchRank(F('search_vector'), search_query)
-        ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.1)).order_by('-similarity', "-rank")
+        ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.1) | Q(title__icontains=search)).order_by('-similarity', "-rank")
 
         attrs['products'] = products
         return attrs
