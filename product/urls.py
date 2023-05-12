@@ -6,7 +6,7 @@ from rest_framework import routers
 app_name = 'core'
 router = routers.DefaultRouter()
 
-router.register('search', SearchView, basename='search')
+router.register('search/', SearchView, basename='search')
 
 urlpatterns = [
     path('product/list/',
@@ -17,6 +17,8 @@ urlpatterns = [
          CategoryView.as_view({'get': 'list_products'}), name='category-products'),
     path('category/list/',
          CategoryView.as_view({'get': 'list'}), name='category-list'),
+    path('search/<str:search>/',
+         SearchView.as_view({'post': 'search'}), name='search'),
+
 
 ]
-urlpatterns += router.urls
