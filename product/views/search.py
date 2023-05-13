@@ -13,7 +13,7 @@ class SearchView(viewsets.GenericViewSet):
     queryset = Product.objects.all()
     serializer_class = SearchSerializer
 
-    @action(methods=['post'], detail=False)
+    @action(methods=['post'], detail=False, url_path='products/(?P<search>[^/]+)')
     def search(self, request, search):
         search_query = SearchQuery(search)
         filters = request.data.get('filters', {})
