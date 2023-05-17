@@ -25,7 +25,7 @@ class Category(models.Model):
     parent = models.ForeignKey(
         'self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategory')
 
-    image = models.ImageField(upload_to=categor_image_path)
+    image = models.ImageField(upload_to=categor_image_path, null=True, blank=True)
     slug = models.SlugField(max_length=255, unique=True, null=True, blank=True)
 
     def __str__(self) -> str:

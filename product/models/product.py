@@ -40,7 +40,8 @@ class ProductManager(models.Manager):
             if product.price != new_price or product.sale_price != new_sale_price:
                 old_price = product.price
                 old_sale_price = product.sale_price
-                Product.objects.filter(uid=uid, vendor=vendor).update(price=new_price, sale_price=new_sale_price)
+                available = False if new_price is None else True
+                Product.objects.filter(uid=uid, vendor=vendor).update(price=new_price, sale_price=new_sale_price, available=available)
                 Price.objects.get_or_create(
                     product=product,
                     price=old_sale_price if old_sale_price is not None else old_price,

@@ -2,7 +2,7 @@ from django.db import models
 
 
 class MainFields(models.Model):
-    model = models.CharField(max_length=255, null=True)
+    model_name = models.CharField(max_length=255, null=True)
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE)
 
     class Meta:
@@ -10,7 +10,7 @@ class MainFields(models.Model):
 
 
 class OperatingSystem(models.Model):
-    operating_system = models.CharField(max_length=50, null=True, blank=True)
+    operating_system = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -63,8 +63,8 @@ class Battery(models.Model):
         abstract = True
 
 class GeneralStorage(models.Model):
-    storage = models.CharField(max_length=10 ,null=True)
-    ram = models.CharField(max_length=10, null=True)
+    storage = models.DecimalField(max_digits=7, decimal_places=2 ,null=True)
+    ram = models.DecimalField(max_digits=7, decimal_places=2, null=True)
     class Meta:
         abstract = True
 
