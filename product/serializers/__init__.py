@@ -1,3 +1,3 @@
 from .product import *
-from .search import *
 from .category import *
+from .search import *

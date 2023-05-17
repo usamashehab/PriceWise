@@ -1,12 +1,8 @@
-
 from rest_framework import serializers
-from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
-from ..models import Product
-from django.db.models import F, Q
-from ..serializers import ProductSerializer
 
 
 class SearchSerializer(serializers.Serializer):
+<<<<<<< HEAD
     search = serializers.CharField(write_only=True)
     products = ProductSerializer(many=True, read_only=True)
 
@@ -24,3 +20,6 @@ class SearchSerializer(serializers.Serializer):
 
         attrs['products'] = products
         return attrs
+=======
+    search = serializers.CharField(max_length=200)
+>>>>>>> 96235974e117b8bde20980e17a074e52bca58b86
