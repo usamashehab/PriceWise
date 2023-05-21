@@ -5,6 +5,8 @@ from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimil
 from django.db.models import F, Q
 from rest_framework.response import Response
 from ..signals import product_retrieved
+from rest_framework.decorators import action
+from django.db.models import F, FloatField
 
 
 class ProductView(viewsets.GenericViewSet,
@@ -14,6 +16,7 @@ class ProductView(viewsets.GenericViewSet,
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
     http_method_names = ['get']
+    lookup_field = 'slug'
 
     def get_object(self):
         slug = self.kwargs.get('slug')
@@ -48,3 +51,11 @@ class ProductView(viewsets.GenericViewSet,
         # send signal
         product_retrieved.send(sender=Product, instance=product)
         return Response(data)
+
+    @action(methods=['get'], detail=False)
+    def deals(self, request):
+        products = self.queryset.filter(sale_price__isnull=False).annotate(
+            deal=100 - (F('sale_price') / F('price') * 100)
+        ).order_by('-deal')
+        serializer = self.get_serializer(products, many=True)
+        return Response(serializer.data, status=200)
