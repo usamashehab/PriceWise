@@ -12,6 +12,7 @@ class CategoryView(viewsets.GenericViewSet,
     serializer_class = ProductSerializer
     queryset = Category.objects.prefetch_related('products').all()
     http_method_names = ['get']
+    lookup_field = 'slug'
 
     def get_serializer_class(self):
         if self.action == 'list':

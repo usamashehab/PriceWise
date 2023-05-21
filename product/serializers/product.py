@@ -19,39 +19,38 @@ class MobileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Mobile
-        fields = [
-            'id',
-            'model_name',
-
-        ]
-
-
-class ProductSerializer(serializers.ModelSerializer):
-    price_history = PriceSerializer(read_only=True, many=True)
-    mobile = MobileSerializer(read_only=True)
-
-    class Meta:
-        model = Product
-        exclude = ('search_vector',)
-        depth = 1
+        exclude = ('product',)
 
 
 class TVSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TV
-        fields = '__all__'
+        exclude = ('product',)
 
 
 class LaptopSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Laptop
-        fields = '__all__'
+        exclude = ('product',)
 
 
 class TabletSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tablet
-        fields = '__all__'
+        exclude = ('product',)
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    price_history = PriceSerializer(read_only=True, many=True)
+    mobile = MobileSerializer(read_only=True)
+    tv = TVSerializer(read_only=True)
+    laptop = LaptopSerializer(read_only=True)
+    tablet = TabletSerializer(read_only=True)
+    deal = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Product
+        exclude = ('search_vector',)

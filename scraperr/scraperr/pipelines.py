@@ -1,8 +1,8 @@
 from product.models.product import (Product,
                                     Image)
-from product.models.core import(Mobile,
-                                Laptop,
-                                TV)
+from product.models.core import (Mobile,
+                                 Laptop,
+                                 TV)
 from product.models.category import Category
 from product.models.vendor import Vendor
 import scrapy
@@ -14,6 +14,7 @@ category_model_map = {
     'Laptop': Laptop,
     'TV': TV
 }
+
 
 class ProductPipeline:
 
@@ -31,15 +32,15 @@ class ProductPipeline:
                 # just updated the product price history
                 return product
         else:
-            #  Store Product images
+            # Store Product images
             item.pop('is_product')
             vendor = Vendor.objects.get(name=item.pop('vendor'))
             uid = item.pop('uid')
             product = Product.objects.get(uid=uid, vendor=vendor)
             for order, image in enumerate(item.pop('images_ids')):
                 img, created = Image.objects.get_or_create(
-                    product = product,
-                    image_url = image,
+                    product=product,
+                    image_url=image,
                     order=order
                 )
                 if created:
@@ -48,8 +49,10 @@ class ProductPipeline:
             try:
                 brand = item.pop('brand')
                 description = item.pop('description')
-                logging.info(f"Item {uid} Trying to update brand and description")
-                Product.objects.filter(uid=uid, vendor=vendor).update(brand=brand, description=description)
+                logging.info(
+                    f"Item {uid} Trying to update brand and description")
+                Product.objects.filter(uid=uid, vendor=vendor).update(
+                    brand=brand, description=description)
             except Product.DoesNotExist:
                 pass
 

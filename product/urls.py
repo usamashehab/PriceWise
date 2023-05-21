@@ -6,19 +6,7 @@ app_name = 'core'
 router = routers.DefaultRouter()
 
 router.register('search', SearchView, basename='search')
+router.register('product', ProductView, basename='product')
+router.register('category', CategoryView, basename='category')
 
-urlpatterns = [
-    path('product/list/',
-         ProductView.as_view({'get': 'list'}), name='product-list'),
-    path('product/<slug:slug>/',
-         ProductView.as_view({'get': 'retrieve'}), name='product-detail'),
-    path('category/<slug:slug>/products/',
-         CategoryView.as_view({'get': 'list_products'}), name='category-products'),
-    path('category/list/',
-         CategoryView.as_view({'get': 'list'}), name='category-list'),
-    #     path('search/<str:search>/',
-    #          SearchView.as_view({'post': 'search'}), name='search'),
-
-]
-
-urlpatterns += router.urls
+urlpatterns = router.urls
