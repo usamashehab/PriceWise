@@ -61,6 +61,8 @@ class ProductSerializer(serializers.ModelSerializer):
     vendor = serializers.SerializerMethodField(
         'get_vendor_name', read_only=True)
     images = ImageSerializer(read_only=True, many=True)
+    category = serializers.SerializerMethodField(
+        'get_category_name', read_only=True)
 
     class Meta:
         model = Product
@@ -68,3 +70,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_vendor_name(self, obj):
         return obj.vendor.name
+
+    def get_category_name(self, obj):
+        return obj.category.name
