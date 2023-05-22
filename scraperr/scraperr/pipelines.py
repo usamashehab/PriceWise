@@ -36,7 +36,7 @@ class ProductPipeline:
             item.pop('is_product')
             vendor = Vendor.objects.get(name=item.pop('vendor'))
             uid = item.pop('uid')
-            product = Product.objects.get(uid=uid, vendor=vendor)
+            product = Product.objects.filter(uid=uid, vendor=vendor).first()
             for order, image in enumerate(item.pop('images_ids')):
                 img, created = Image.objects.get_or_create(
                     product=product,
