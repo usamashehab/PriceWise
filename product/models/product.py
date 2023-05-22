@@ -12,6 +12,7 @@ from django.utils.text import slugify
 from datetime import date
 from decimal import Decimal
 
+
 class ProductManager(models.Manager):
 
     def get_queryset(self):
@@ -29,18 +30,21 @@ class ProductManager(models.Manager):
         vendor = Vendor.objects.get(name=kwargs.pop('vendor'))
         #  should pass Category and Vendor as An object
         product, created = Product.objects.get_or_create(uid=uid,
-                                                        vendor=vendor, category=category,
-                                                        defaults=kwargs)
+                                                         vendor=vendor, category=category,
+                                                         defaults=kwargs)
 
         if not created:
-            new_price = Decimal(kwargs.get('price')) if kwargs.get('price') is not None else None 
-            new_sale_price = Decimal(kwargs.get('sale_price')) if kwargs.get('sale_price') is not None else None
+            new_price = Decimal(kwargs.get('price')) if kwargs.get(
+                'price') is not None else None
+            new_sale_price = Decimal(kwargs.get('sale_price')) if kwargs.get(
+                'sale_price') is not None else None
 
             # Product exists, update its price and sale_price fields
             if product.price != new_price or product.sale_price != new_sale_price:
                 old_price = product.price
                 old_sale_price = product.sale_price
-                Product.objects.filter(uid=uid, vendor=vendor).update(price=new_price, sale_price=new_sale_price)
+                Product.objects.filter(uid=uid, vendor=vendor).update(
+                    price=new_price, sale_price=new_sale_price)
                 Price.objects.get_or_create(
                     product=product,
                     price=old_sale_price if old_sale_price is not None else old_price,
@@ -89,6 +93,7 @@ class Product(models.Model):
     search_vector = SearchVectorField(null=True, blank=True)
 
     objects = ProductManager()
+
     class Meta(object):
         indexes = [GinIndex(fields=['search_vector'])]
         unique_together = ('vendor', 'uid')
@@ -119,7 +124,7 @@ class Price(models.Model):
     date = models.DateField(default=date.today)
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['date']
 
 
 class Image(models.Model):

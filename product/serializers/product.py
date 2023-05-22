@@ -5,7 +5,8 @@ from ..models import (
     Mobile,
     TV,
     Laptop,
-    Tablet
+    Tablet,
+    Image
 )
 
 
@@ -43,6 +44,13 @@ class TabletSerializer(serializers.ModelSerializer):
         exclude = ('product',)
 
 
+class ImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Image
+        fields = ('image_url', 'order')
+
+
 class ProductSerializer(serializers.ModelSerializer):
     price_history = PriceSerializer(read_only=True, many=True)
     mobile = MobileSerializer(read_only=True)
@@ -52,6 +60,7 @@ class ProductSerializer(serializers.ModelSerializer):
     deal = serializers.CharField(read_only=True)
     vendor = serializers.SerializerMethodField(
         'get_vendor_name', read_only=True)
+    images = ImageSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product
