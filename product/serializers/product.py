@@ -50,7 +50,12 @@ class ProductSerializer(serializers.ModelSerializer):
     laptop = LaptopSerializer(read_only=True)
     tablet = TabletSerializer(read_only=True)
     deal = serializers.CharField(read_only=True)
+    vendor = serializers.SerializerMethodField(
+        'get_vendor_name', read_only=True)
 
     class Meta:
         model = Product
         exclude = ('search_vector',)
+
+    def get_vendor_name(self, obj):
+        return obj.vendor.name
