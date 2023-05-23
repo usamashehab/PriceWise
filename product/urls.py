@@ -9,4 +9,9 @@ router.register('search', SearchView, basename='search')
 router.register('product', ProductView, basename='product')
 router.register('category', CategoryView, basename='category')
 
-urlpatterns = router.urls
+urlpatterns = [
+
+    path('category/<slug:slug>/products/',
+         CategoryView.as_view({'get': 'list_products'}), name='list_products'),
+]
+urlpatterns += router.urls

@@ -23,7 +23,6 @@ class CategoryView(viewsets.GenericViewSet,
         slug = self.kwargs.get('slug')
         return self.queryset.filter(slug=slug).first()
 
-    @action(methods=['get'], detail=True, url_path='category/<slug:slug>/products')
     def list_products(self, request, *args, **kwargs):
         category = self.get_object()
         products = category.products.filter(category=category)
