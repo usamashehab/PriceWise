@@ -57,5 +57,10 @@ class ProductView(viewsets.GenericViewSet,
         products = self.queryset.filter(sale_price__isnull=False).annotate(
             deal=100 - (F('sale_price') / F('price') * 100)
         ).order_by('-deal')
+        page = self.paginate_queryset(products)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = self.get_serializer(products, many=True)
         return Response(serializer.data, status=200)
