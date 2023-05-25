@@ -49,7 +49,8 @@ def get_product_images(imags_links_list):
     Returns:
     list of string (ids)
     """
-    return re.findall(r'I\/(.*?)\.', ''.join(imags_links_list))
+    ids = re.findall(r'I\/(.*?)\.', ''.join(imags_links_list))
+    return ["https://m.media-amazon.com/images/I/"+id+".jpg" for id in ids"]
 
 def get_description(description):
     """

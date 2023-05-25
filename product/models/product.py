@@ -127,8 +127,7 @@ class Price(models.Model):
 class Image(models.Model):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='images')
-    image_url = models.CharField(max_length=50)
-    # alt = models.CharField(max_length=255, null=True, blank=True)
+    image_url = models.URLField(max_length=255)
     order = models.IntegerField(default=0)
 
     class Meta:
