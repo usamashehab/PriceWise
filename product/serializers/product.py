@@ -52,6 +52,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    category_id = serializers.IntegerField(write_only=True)
     price_history = PriceSerializer(read_only=True, many=True)
     mobile = MobileSerializer(read_only=True)
     tv = TVSerializer(read_only=True)
@@ -73,3 +74,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_category_name(self, obj):
         return obj.category.name
+
+
+class DealSerializer(serializers.Serializer):
+    category = serializers.IntegerField(required=False)
