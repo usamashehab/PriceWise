@@ -10,7 +10,6 @@ from django.db.models import F, FloatField
 
 
 class ProductView(viewsets.GenericViewSet,
-                  mixins.ListModelMixin,
                   mixins.RetrieveModelMixin
                   ):
     serializer_class = ProductSerializer
@@ -64,3 +63,15 @@ class ProductView(viewsets.GenericViewSet,
 
         serializer = self.get_serializer(products, many=True)
         return Response(serializer.data, status=200)
+
+    @action(methods=['get'], detail=False, url_path='popular')
+    def popular(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
