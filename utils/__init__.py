@@ -48,13 +48,18 @@ def get_filter_attrs(category_name, products):
     attrs = cache.get(cache_key)
     if attrs is not None:
         return attrs
-    model_lower_name = category_name.lower()
+
     # If the result is not in the cache, do the query and cache the result
-    attrs_dict = {
-        f"{model_lower_name}__{key}": (attrs := model[category_name].objects.filter(**{f"{key}__isnull": False}).values(key).annotate(
-            count=Count(key)).order_by(key).values_list(key, 'count'))
-        for key in filter_attrs[category_name] if attrs
-    }
+    model_lower_name = category_name.lower()
+    attrs_dict = {}
+
+    for key in filter_attrs[category_name]:
+        query_params = {f"{key}__isnull": False}
+        attrs = model[category_name].objects.filter(**query_params).values(
+            key).annotate(count=Count(key)).order_by(key).values_list(key, 'count')
+        if attrs:
+            attrs_dict[f"{model_lower_name}__{key}"] = attrs
+
     attrs_dict['category'] = get_categories()
     attrs_dict['brand'] = get_brands(products)
     cache.set(cache_key, attrs_dict, timeout=60*60*24)
