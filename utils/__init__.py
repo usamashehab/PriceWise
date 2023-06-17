@@ -7,7 +7,7 @@ from product.models import (
     Tablet,
     Category
 )
-
+from .debug import query_debugger
 
 common_attrs = [
     "ram",
@@ -45,46 +45,31 @@ model = {
 
 def get_filter_attrs(category_name, products):
     cache_key = f"filtered_attrs_{category_name}"
-    attrs = cache.get(cache_key)
-    if attrs is not None:
-        return attrs
-
-    # If the result is not in the cache, do the query and cache the result
     model_lower_name = category_name.lower()
     attrs_dict = {}
 
     for key in filter_attrs[category_name]:
         query_params = {f"{key}__isnull": False}
-        attrs = model[category_name].objects.filter(**query_params).values(
+        attrs = model[category_name].objects.filter(**query_params, product__in=products).values(
             key).annotate(count=Count(key)).order_by(key).values_list(key, 'count')
+
         if attrs:
             attrs_dict[f"{model_lower_name}__{key}"] = attrs
 
-    attrs_dict['category'] = get_categories()
+    attrs_dict['category'] = get_categories(products)
     attrs_dict['brand'] = get_brands(products)
     cache.set(cache_key, attrs_dict, timeout=60*60*24)
     return attrs_dict
 
 
-def get_categories():
-    cache_key = f"categories"
-    categories = cache.get(cache_key)
-    if categories is not None:
-        return categories
-
-    # If the result is not in the cache, do the query and cache the result
+def get_categories(products):
+    categories = products.values_list('category__name', 'category__id')
     categories = Category.objects.all().values_list('id', 'name')
-    cache.set(cache_key, categories, timeout=60*60*24)
     return categories
 
 
 def get_brands(products):
-    cache_key = f"brands"
-    brands = cache.get(cache_key)
-    if brands is not None:
-        return brands
     brands = products.values('brand').annotate(count=Count(
         'brand')).order_by('brand').values_list('brand', 'count')
 
-    cache.set(cache_key, brands, timeout=60*60*24)
     return brands
