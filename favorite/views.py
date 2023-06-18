@@ -2,7 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Favorite
-from .serializers import FavoriteSerializer
+from .serializers import FavoriteSerializer, UpdateFavoriteSerializer
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -21,6 +21,11 @@ class FavoriteView(
     def get_queryset(self):
         user = self.request.user
         return Favorite.objects.filter(user=user)
+
+    def get_serializer_class(self):
+        if self.action == 'partial_update':
+            return UpdateFavoriteSerializer
+        return super().get_serializer_class()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(

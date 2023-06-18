@@ -24,3 +24,11 @@ class FavoriteSerializer(serializers.ModelSerializer):
             raise exceptions.ValidationError("No product with this id")
         user = self.context['request'].user
         return Favorite.objects.create(user=user, product=product ** validated_data)
+
+
+class UpdateFavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = [
+            'desired_price',
+        ]
