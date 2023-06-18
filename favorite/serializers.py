@@ -13,17 +13,18 @@ class FavoriteSerializer(serializers.ModelSerializer):
         fields = [
             'product',
             'desired_price',
-            'product_id'
+            'product_id',
+            'id'
         ]
 
     def create(self, validated_data):
-        product = validated_data.pop('product_id', None)
+        _product = validated_data.pop('product_id', None)
         try:
-            product = Product.objects.get(id=product)
+            _product = Product.objects.get(id=_product)
         except Product.DoesNotExist:
             raise exceptions.ValidationError("No product with this id")
         user = self.context['request'].user
-        return Favorite.objects.create(user=user, product=product ** validated_data)
+        return Favorite.objects.create(user=user, product=_product, ** validated_data)
 
 
 class UpdateFavoriteSerializer(serializers.ModelSerializer):
