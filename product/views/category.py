@@ -4,6 +4,7 @@ from ..serializers import ProductSerializer, CategorySerializer
 from ..models import Category
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from ..models import Product
 
 
 class CategoryView(viewsets.GenericViewSet,
@@ -38,11 +39,11 @@ class CategoryView(viewsets.GenericViewSet,
     def list_products(self, request, *args, **kwargs):
         category = self.get_object()
         category_parent = category.parent
-        if category_parent:
-            products = category.products.filter(
-                category__parent=category_parent)
+        if not category_parent:
+            products = Product.objects.filter(
+                category__parent=category)
         else:
-            products = category.products.filter(category=category)
+            products = category.products.filter()
 
         page = self.paginate_queryset(products)
         if page is not None:
