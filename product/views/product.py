@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from ..signals import product_retrieved
 from rest_framework.decorators import action
 from django.db.models import F, FloatField
+from decimal import Decimal
 
 
 class ProductView(viewsets.GenericViewSet,
@@ -52,12 +53,14 @@ class ProductView(viewsets.GenericViewSet,
 
             category = product.category
             parent_category = category.parent
+            price_range = (product.price * Decimal(0.8),
+                           product.price * Decimal(1.2))
             if parent_category:
                 similar_products = Product.objects.filter(
-                    category__parent=parent_category)[:15]
+                    category__parent=parent_category, price__range=price_range)[:15]
             else:
                 similar_products = Product.objects.filter(
-                    category=category)[:15]
+                    category=category, price__range=price_range)[:15]
 
             similar_products = ProductSerializer(
                 similar_products, many=True).data
