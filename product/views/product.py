@@ -29,32 +29,48 @@ class ProductView(viewsets.GenericViewSet,
 
     def retrieve(self, request, *args, **kwargs):
         product = self.get_object()
-        serializer = self.get_serializer(product)
-        # get all other vendors except current vendor of product
-        other_vendors = Vendor.objects.exclude(id=product.vendor.id)
+        if product:
+            serializer = self.get_serializer(product)
+            # get all other vendors except current vendor of product
+            other_vendors = Vendor.objects.exclude(id=product.vendor.id)
 
-        similar_product_other_vendor = list()
-        for vendor in other_vendors:
-            # search for similar product of other vendors
-            search_query = SearchQuery(product.title)
-            similar_product = vendor.products.annotate(
-                similarity=TrigramSimilarity('title', product.title),
-                rank=SearchRank(F('search_vector'), search_query)
-            ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.1)).order_by('-similarity', "-rank", "sale_price", "price").first()
-            if similar_product:
-                similar_product_other_vendor.append(similar_product)
+            similar_product_other_vendor = list()
+            for vendor in other_vendors:
+                # search for similar product of other vendors
+                search_query = SearchQuery(product.title)
+                similar_product = vendor.products.annotate(
+                    similarity=TrigramSimilarity('title', product.title),
+                    rank=SearchRank(F('search_vector'), search_query)
+                ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.1)).order_by('-similarity', "-rank", "sale_price", "price").first()
+                if similar_product:
+                    similar_product_other_vendor.append(similar_product)
 
-        similar_products_data = ProductSerializer(
-            similar_product_other_vendor,
-            many=True
-        ).data
+            same_products_data = ProductSerializer(
+                similar_product_other_vendor,
+                many=True
+            ).data
 
-        data = {"product": serializer.data,
-                "similar_products": similar_products_data}
+            category = product.category
+            parent_category = category.parent
+            if parent_category:
+                similar_products = Product.objects.filter(
+                    category__parent=parent_category)[:15]
+            else:
+                similar_products = Product.objects.filter(
+                    category=category)[:15]
 
-        # send signal
-        product_retrieved.send(sender=Product, instance=product)
-        return Response(data)
+            similar_products = ProductSerializer(
+                similar_products, many=True).data
+
+            data = {"product": serializer.data,
+                    "same_product_other_vendor": same_products_data,
+                    "similar_products": similar_products}
+
+            # send signal to increase view count
+            product_retrieved.send(sender=Product, instance=product)
+            return Response(data)
+
+        return Response({'message': 'Product not found'}, status=404)
 
     @action(methods=['get'], detail=False, url_path='(?P<category_slug>[^/]+)/deals')
     def deals(self, request, *args, **kwargs):
