@@ -37,7 +37,13 @@ class CategoryView(viewsets.GenericViewSet,
 
     def list_products(self, request, *args, **kwargs):
         category = self.get_object()
-        products = category.products.filter(category=category)
+        category_parent = category.parent
+        if category_parent:
+            products = category.products.filter(
+                category__parent=category_parent)
+        else:
+            products = category.products.filter(category=category)
+
         page = self.paginate_queryset(products)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
