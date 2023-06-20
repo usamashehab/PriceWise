@@ -37,15 +37,16 @@ class FavoriteView(
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        count = queryset.filter(desired_price_reached=True).count()
+        count = queryset.filter(price_change_notified=True).count()
+        data = {
+            'count': count
+        }
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+            data['products'] = serializer.data
+            return self.get_paginated_response(data)
 
         serializer = self.get_serializer(queryset, many=True)
-        data = {
-            'products': serializer.data,
-            'count': count
-        }
+        data['products'] = serializer.data
         return Response(data)

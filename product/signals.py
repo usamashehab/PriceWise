@@ -1,33 +1,108 @@
-from django.core.mail import send_mail
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.postgres.search import SearchVector
 from .models import Product
 from django.dispatch import Signal
 from favorite.models import Favorite
 from django.conf import settings
+from notification.models import Notification
+
+# @receiver(post_save, sender=Product)
+# def product_post_save(sender, instance, **kwargs):
+#     # Update desired_price_reached for related Favorite instances
+#     favorites_1 = Favorite.objects.filter(
+#         notify_when_any_drop=False, product=instance, desired_price__gte=instance.price)
+#     favorites_1.update(notify=True)
+
+#     favorites_2 = Favorite.objects.filter(
+#         notify_when_any_drop=True, product=instance, last_notified_price__gte=instance.price)
+#     favorites_2.update(notify=True, last_notified_price=instance.price)
+
+#     favorites = favorites_1 | favorites_2
+
+#     notifications = list()
+#     # Send email to users
+#     emails = list()
+#     for favorite in favorites:
+#         user = favorite.user
+#         emails.append(user.email)
+
+#         notification_title = f'Price of {instance.name} has dropped to {instance.price} harry up and buy it'
+#         notification = Notification(
+#             user=user, favorite=favorite, title=notification_title)
+#         notifications.append(notification)
+
+#     Notification.objects.bulk_create(notifications)
+
+#     send_mail(
+#         subject='Price Alert',
+#         message=f'Price of {instance.name} has dropped to {instance.price} harry up and buy it',
+#         from_email=settings.EMAIL_HOST_USER,
+#         recipient_list=emails,
+#         fail_silently=False,
+#     )
+from django.core.mail import EmailMessage
+from django.db.models import Q
+from django.dispatch import receiver
+from django.template.loader import render_to_string
 
 
 @receiver(post_save, sender=Product)
 def product_post_save(sender, instance, **kwargs):
-    # Update desired_price_reached for related Favorite instances
-    favorites = Favorite.objects.filter(
-        product=instance, desired_price__gte=instance.price)
-    favorites.update(desired_price_reached=True)
+    update_desired_price_reached(instance)
+    favorites = get_matching_favorites(instance)
 
-    # Send email to users
-    emails = list()
+    notifications = create_notifications(instance, favorites)
+    Notification.objects.bulk_create(notifications)
+
+    send_price_alert_emails(instance, favorites)
+
+
+def update_desired_price_reached(instance):
+    favorites_1 = Favorite.objects.filter(
+        notify_when_any_drop=False, product=instance, desired_price__gte=instance.price).select_related('user')
+    favorites_1.update(price_change_notified=True)
+
+    favorites_2 = Favorite.objects.filter(
+        notify_when_any_drop=True, product=instance, last_notified_price__gte=instance.price).select_related('user')
+    favorites_2.update(price_change_notified=True,
+                       last_notified_price=instance.price)
+
+
+def get_matching_favorites(instance):
+    favorites_1 = Favorite.objects.filter(
+        notify_when_any_drop=False, product=instance, desired_price__gte=instance.price)
+    favorites_2 = Favorite.objects.filter(
+        notify_when_any_drop=True, product=instance, last_notified_price__gte=instance.price)
+    return favorites_1 | favorites_2
+
+
+def create_notifications(instance, favorites):
+    notifications = []
     for favorite in favorites:
         user = favorite.user
-        emails.append(user.email)
+        notification_title = f'Price of {instance.title} has dropped to {instance.price}. Hurry up and buy it.'
+        notification = Notification(
+            user=user, favorite=favorite, title=notification_title)
+        notifications.append(notification)
+    return notifications
 
-    send_mail(
-        subject='Desired price reached',
-        message=f'The price for product {instance.title} has reached your desired price.',
+
+def send_price_alert_emails(instance, favorites):
+    emails = favorites.values_list('user__email', flat=True)
+    subject = 'Price Alert'
+    context = {'product': instance}
+    email_body = render_to_string('email/price_alert.html', context)
+
+    email_message = EmailMessage(
+        subject=subject,
+        body=email_body,
         from_email=settings.EMAIL_HOST_USER,
-        recipient_list=emails,
-        fail_silently=False,
+        to=[],
+        bcc=emails
     )
+    email_message.content_subtype = 'html'
+    email_message.send()
 
 
 product_retrieved = Signal()
