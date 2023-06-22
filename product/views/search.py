@@ -22,6 +22,9 @@ class SearchView(viewsets.GenericViewSet):
         filters = [Q(**{f'{k}__in': v}) for k, v in filters.items()]
         # filters = list(map(lambda x: Q(**{x: filters[x]}), filters))
 
+        sort = request.data.get('sort_by', None)
+        sort_keyword = self.get_sort_keyword(sort)
+
         products = Product.objects.annotate(
             similarity=TrigramSimilarity('title', search),
             rank=SearchRank(F('search_vector'), search_query)
@@ -32,8 +35,7 @@ class SearchView(viewsets.GenericViewSet):
             Q(price__range=(min_price, max_price)),
             *filters
         ).order_by(
-            '-similarity',
-            '-rank'
+            *sort_keyword
         )
         category = products.values('category__name').annotate(
             count=Count('category')).order_by('-count').first()
@@ -59,3 +61,18 @@ class SearchView(viewsets.GenericViewSet):
         serializer = self.get_serializer(products, many=True)
         payload['products'] = serializer.data
         return Response(payload, status=200)
+
+    def get_sort_keyword(self, keyword):
+        keywords = {
+            'price_low_to_high': 'price',
+            'price_high_to_low': '-price',
+            'sale_low_to_high': 'deal',
+            'sale_high_to_low': '-deal',
+        }
+        args = ['-similarity',
+                '-rank',
+                ]
+        if keyword and keyword in keywords:
+            args = [keywords.get(keyword)] + args
+
+        return args
