@@ -4,6 +4,7 @@ from ..serializers import ProductSerializer, CategorySerializer
 from ..models import Category
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from ..models import Product
 
 
 class CategoryView(viewsets.GenericViewSet,
@@ -12,6 +13,7 @@ class CategoryView(viewsets.GenericViewSet,
     serializer_class = ProductSerializer
     queryset = Category.objects.prefetch_related('products').all()
     http_method_names = ['get']
+    lookup_field = 'slug'
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -22,10 +24,27 @@ class CategoryView(viewsets.GenericViewSet,
         slug = self.kwargs.get('slug')
         return self.queryset.filter(slug=slug).first()
 
-    @action(methods=['get'], detail=True, url_path='category/<slug:slug>/products')
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset().filter(parent__isnull=True)
+        queryset = self.filter_queryset(queryset)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def list_products(self, request, *args, **kwargs):
         category = self.get_object()
-        products = category.products.filter(category=category)
+        category_parent = category.parent
+        if not category_parent:
+            products = Product.objects.filter(
+                category__parent=category)
+        else:
+            products = category.products.filter()
+
         page = self.paginate_queryset(products)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

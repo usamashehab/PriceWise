@@ -7,6 +7,7 @@ from ..serializers import ProductSerializer, SearchSerializer
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
 from django.db.models import F, Q
 from utils import get_filter_attrs
+from django.db.models import Min, Max
 
 
 class SearchView(viewsets.GenericViewSet):
@@ -17,7 +18,8 @@ class SearchView(viewsets.GenericViewSet):
     def search(self, request, search):
         search_query = SearchQuery(search)
         filters = request.data.get('filters', {})
-        filters = [Q(**{k: v}) for k, v in filters.items()]
+        min_price, max_price = request.data.get('price', (0, 1000000))
+        filters = [Q(**{f'{k}__in': v}) for k, v in filters.items()]
         # filters = list(map(lambda x: Q(**{x: filters[x]}), filters))
 
         products = Product.objects.annotate(
@@ -25,8 +27,9 @@ class SearchView(viewsets.GenericViewSet):
             rank=SearchRank(F('search_vector'), search_query)
         ).filter(
             Q(search_vector=search_query) |
-            Q(similarity__gt=0.08) |
+            Q(similarity__gt=0.1) |
             Q(title__icontains=search),
+            Q(price__range=(min_price, max_price)),
             *filters
         ).order_by(
             '-similarity',
@@ -39,9 +42,14 @@ class SearchView(viewsets.GenericViewSet):
             category_name = category.get('category__name')
             filter_attrs = get_filter_attrs(category_name, products)
         page = self.paginate_queryset(products)
+
+        prices = products.aggregate(
+            min_price=Min('price'), max_price=Max('price'))
         payload = {
             "filter": filter_attrs,
+            "prices": prices
         }
+
         if page is not None:
             # used CompanyProfileSerializer to serialize the companies query
             serializer = ProductSerializer(page, many=True)

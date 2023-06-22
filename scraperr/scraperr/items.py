@@ -1,8 +1,9 @@
 from scrapy_djangoitem import DjangoItem
-from product.models.core import Mobile, TV, Laptop, Tablet
+from product.models.core import Mobile, TV, Laptop
 from w3lib.html import remove_tags
 import requests
 import re
+
 
 def get_price(price_tag):
     """
@@ -18,13 +19,11 @@ def get_price(price_tag):
     price_str = remove_tags(price_tag)
     price_str = price_str.strip().replace(',', '')
     prices = re.findall(r"EGP([0-9]*\.[0-9]*)", price_str)
-    if isinstance(prices, list):
-        if len(prices)==2:
-            return prices
-        else:
-            return [None, prices[0]]
+    if len(prices) == 2:
+        return prices
     else:
         return [None, prices]   
+
 
 def get_product_details(details_list):
     """
@@ -35,9 +34,10 @@ def get_product_details(details_list):
     Return:
         dict
     """
-    details= [item.strip().replace('\u200e','') for item in details_list]
+    details = [item.strip().replace('\u200e', '') for item in details_list]
     details = [i for i in details if i]
     return {details[i]: details[i+1] for i in range(0, len(details), 2)}
+
 
 def get_product_images(imags_links_list):
     """
@@ -50,12 +50,13 @@ def get_product_images(imags_links_list):
     list of string (ids)
     """
     ids = re.findall(r'I\/(.*?)\.', ''.join(imags_links_list))
-    return ["https://m.media-amazon.com/images/I/"+id+".jpg" for id in ids"]
+    return ["https://m.media-amazon.com/images/I/"+id+".jpg" for id in ids]
+
 
 def get_description(description):
     """
     Takes care of either the description is a list, string or None
-    
+
     args: list of strigs
     Returns: str
     """
@@ -68,20 +69,16 @@ def get_description(description):
 
 
 features = {
-    'Mobile': ['Model name','Operating system', 'OS','Memory storage capacity', 'Screen size', 'Installed RAM memory size', 'RAM', \
-               'Connectivity technology', 'Wireless network technology', 'Connectivity technologies'],
-    'Laptop': ['Series', 'Standing screen display size', 'Resolution', \
-                'Processor Brand', 'Processor Type', 'Processor Speed', 'Processor Count', \
-                'Hard Disk Description', 'Installed RAM memory size', 'RAM Size','Memory Technology', \
-                'Graphics Chipset Brand' , 'Graphics Coprocessor', 'Graphics Card Ram Size', \
-                'Hard disk size', 
-                'Operating System', 'Lithium Battery Energy Content'],
-    'TV':['Model name', 'Screen size', 'Display technology', 'Resolution', 'Refresh rate', \
-        'Connectivity technology'],
-    'Tablet':['Series', 'Operating System', \
-        'Standing screen display size', 'Screen size', \
-        'Installed RAM memory size', 'RAM Size', 'Memory storage capacity',\
-        'Connectivity type', 'Battery life'],
+    'Mobile': ['Model name', 'Operating system', 'OS', 'Memory storage capacity', 'Screen size', 'Installed RAM memory size', 'RAM',
+               'Connectivity technology', 'Wireless network technology', 'Connectivity technologies', 'Brand'],
+    'Laptop': ['Series', 'Standing screen display size', 'Resolution',
+               'Processor Brand', 'Processor Type', 'Processor Speed', 'Processor Count',
+               'Hard Disk Description', 'Installed RAM memory size', 'Memory Technology',
+               'Graphics Chipset Brand', 'Graphics Coprocessor', 'Graphics Card Ram Size',
+               'Operating System', 'Lithium Battery Energy Content', 'Brand'
+               ],
+    'TV': ['Model name', 'Screen size', 'Display technology', 'Resolution', 'Refresh rate',
+           'Connectivity technology', 'Brand']
 }
 
 
@@ -97,10 +94,10 @@ def handle_product_variations(func):
         for feature in features_list:
             if feature in result_dict:
                 result_dict[feature] = result_dict.get(feature)
-            else :
+            else:
                 result_dict[feature] = None
-        filtered_result = {k: v for k, v in result_dict.items() if k in features_list}
-        filtered_result['title'] = result['title']
+        filtered_result = {k: v for k,
+                           v in result_dict.items() if k in features_list}
         filtered_result = prepare_item(filtered_result, category)
         filtered_result['images_ids'] = result['images_ids']
         filtered_result['uid'] = result['uid']
@@ -110,90 +107,79 @@ def handle_product_variations(func):
         yield filtered_result
     return wrapper
 
-model_map={
-    'Mobile':{
+
+model_map = {
+    'Mobile': {
         # MainFields
-        'Model name' : 'model_name',
+        'Model name': 'model_name',
+        'Brand': 'brand',
         # Operating system
         'OS': 'operating_system',
         'Operating system': 'operating_system',
         # Connectivity
-        'Wireless network technology' : 'connectivity_tech',
+        'Wireless network technology': 'connectivity_tech',
         'Connectivity technology': 'connectivity_tech',
         'Connectivity technologies': 'connectivity_tech',
         # General Storage
-        'Memory storage capacity':'storage',
+        'Memory storage capacity': 'storage',
+        'RAM': 'ram',
         'Installed RAM memory size': 'ram',
         'RAM': 'ram',
         # Display
         'Screen size': 'display_size'
-        },
-    'Laptop':{
+    },
+    'Laptop': {
         # MainFields
-        'Series' : 'model_name',
+        'Series': 'model_name',
+        'Brand': 'brand',
         # Operating system
         'Operating System': 'operating_system',
         'OS': 'operating_system',
         # Connectivity
         'Connectivity technology': 'connectivity_tech',
         # Generak Storage
-        'Memory storage capacity':'storage',
-        'Hard disk size':'storage',
-        'Hard Disk Description':'storage_type',
+        'Memory storage capacity': 'storage',
+        'Hard Disk Description': 'storage_type',
         'RAM': 'ram',
         'Installed RAM memory size': 'ram',
         'RAM Size': 'ram',
         'Memory Technology': 'ram_type',
         # Display
         'Standing screen display size': 'display_size',
-        'Resolution' : 'display_resolution',
+        'Resolution': 'display_resolution',
         # Processor
-        'Processor Brand' : 'cpu_brand',
-        'Processor Type':'cpu_type',
+        'Processor Brand': 'cpu_brand',
+        'Processor Type': 'cpu_type',
         'Processor Speed': 'cpu_speed',
-        'Processor Count' : 'cpu_num_cores',
+        'Processor Count': 'cpu_num_cores',
         # Graphics
-        'Graphics Chipset Brand' : 'gpu_brand',
-        'Graphics Coprocessor' : 'gpu_coprocessor',
-        'Graphics Card Ram Size' : 'gpu_memory',
+        'Graphics Chipset Brand': 'gpu_brand',
+        'Graphics Coprocessor': 'gpu_coprocessor',
+        'Graphics Card Ram Size': 'gpu_memory',
         # Battery
-        'Lithium Battery Energy Content' : 'battery_life'
+        'Lithium Battery Energy Content': 'battery_life'
     },
     'TV': {
         # MainFields
         'Model name': 'model_name',
+        'Brand': 'brand',
         # Connectivity
         'Connectivity technology': 'connectivity_tech',
         # Display
         'Screen size': 'display_size',
-        'Display technology' : 'display_type',
-        'Resolution' : 'display_resolution',
-        'Refresh rate' : 'refresh_rate',
+        'Display technology': 'display_type',
+        'Resolution': 'display_resolution',
+        'Refresh rate': 'refresh_rate',
         # Model Fields
-        'Supported Internet services' : 'smart_tv'
-    },
-    'Tablet':{
-        # MainFields
-        'Series' : 'model_name',
-        # Operating system
-        'Operating System': 'operating_system',
-        # Connectivity
-        'Connectivity type': 'connectivity_tech',
-        # General Storage
-        'Memory storage capacity':'storage',
-        'RAM Size': 'ram',
-        'Installed RAM memory size': 'ram',
-        # Display
-        'Standing screen display size': 'display_size',
-        'Screen size': 'display_size',
-        # Battery
-        'Battery life': 'battery_life'
-    },
+        'Supported Internet services': 'smart_tv'
+    }
 }
+
+
 def prepare_item(item: dict, category: str):
     """
     prepares item keys to the specified Model
-    
+
     args:
         item: dict of scrapped item
         category: str 
@@ -202,26 +188,10 @@ def prepare_item(item: dict, category: str):
     """
     mapper = model_map[category]
     for scraped_field, model_field in mapper.items():
-            if scraped_field in item:
-                value = item.get(scraped_field)
-                if category in ['Mobile', 'Laptop', 'Tablet'] and model_field == 'ram':
-                    if value is None:
-                        value = get_ram_from(item['title'])
-                    else:
-                        value = get_ram_from(value)
-                    if value is not None:
-                        if value < 1:
-                            value = 1
-                        if value > 32:
-                            value = 8
-                if category in ['Mobile', 'Laptop', 'Tablet'] and model_field == 'storage':
-                    if value is None:
-                        value = get_storage_from(item['title'])
-                    else:
-                        value = get_storage_from(value)
-                item[model_field] = value
-                del item[scraped_field]
-    item.pop('title')
+        if scraped_field in item:
+            value = item.get(scraped_field)
+            item[model_field] = value
+            del item[scraped_field]
     return item
 
 

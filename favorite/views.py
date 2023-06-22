@@ -2,7 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Favorite
-from .serializers import FavoriteSerializer
+from .serializers import FavoriteSerializer, UpdateFavoriteSerializer
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -22,6 +22,11 @@ class FavoriteView(
         user = self.request.user
         return Favorite.objects.filter(user=user)
 
+    def get_serializer_class(self):
+        if self.action == 'partial_update':
+            return UpdateFavoriteSerializer
+        return super().get_serializer_class()
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(
             data=request.data, context={'request': request})
@@ -32,15 +37,16 @@ class FavoriteView(
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        count = queryset.filter(desired_price_reached=True).count()
+        count = queryset.filter(price_change_notified=True).count()
+        data = {
+            'count': count
+        }
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+            data['products'] = serializer.data
+            return self.get_paginated_response(data)
 
         serializer = self.get_serializer(queryset, many=True)
-        data = {
-            'products': serializer.data,
-            'count': count
-        }
+        data['products'] = serializer.data
         return Response(data)

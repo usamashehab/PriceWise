@@ -5,7 +5,8 @@ from ..models import (
     Mobile,
     TV,
     Laptop,
-    Tablet
+    Tablet,
+    Image
 )
 
 
@@ -19,39 +20,61 @@ class MobileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Mobile
-        fields = [
-            'id',
-            'model_name',
-
-        ]
-
-
-class ProductSerializer(serializers.ModelSerializer):
-    price_history = PriceSerializer(read_only=True, many=True)
-    mobile = MobileSerializer(read_only=True)
-
-    class Meta:
-        model = Product
-        exclude = ('search_vector',)
-        depth = 1
+        exclude = ('product',)
 
 
 class TVSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TV
-        fields = '__all__'
+        exclude = ('product',)
 
 
 class LaptopSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Laptop
-        fields = '__all__'
+        exclude = ('product',)
 
 
 class TabletSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tablet
-        fields = '__all__'
+        exclude = ('product',)
+
+
+class ImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Image
+        fields = ('image_url', 'order')
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    category_id = serializers.IntegerField(write_only=True)
+    price_history = PriceSerializer(read_only=True, many=True)
+    mobile = MobileSerializer(read_only=True)
+    tv = TVSerializer(read_only=True)
+    laptop = LaptopSerializer(read_only=True)
+    tablet = TabletSerializer(read_only=True)
+    deal = serializers.CharField(read_only=True)
+    vendor = serializers.SerializerMethodField(
+        'get_vendor_name', read_only=True)
+    images = ImageSerializer(read_only=True, many=True)
+    category = serializers.SerializerMethodField(
+        'get_category_name', read_only=True)
+
+    class Meta:
+        model = Product
+        exclude = ('search_vector',)
+
+    def get_vendor_name(self, obj):
+        return obj.vendor.name
+
+    def get_category_name(self, obj):
+        return obj.category.name
+
+
+class DealSerializer(serializers.Serializer):
+    category = serializers.IntegerField(required=False)
