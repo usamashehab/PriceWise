@@ -14,9 +14,9 @@ class ProductView(viewsets.GenericViewSet,
                   mixins.RetrieveModelMixin
                   ):
     serializer_class = ProductSerializer
-    queryset = Product.objects.all()
     http_method_names = ['get']
     lookup_field = 'slug'
+    queryset = Product.objects.all()
 
     def get_object(self):
         slug = self.kwargs.get('slug')
@@ -81,11 +81,9 @@ class ProductView(viewsets.GenericViewSet,
         if category_slug == 'all':
             category_slug = None
         if category_slug:
-            self.queryset = self.queryset.filter(category__slug=category_slug)
+            self.queryset = self.get_queryset().filter(category__slug=category_slug)
 
-        products = self.queryset.filter(sale_price__isnull=False).annotate(
-            deal=100 - (F('sale_price') / F('price') * 100)
-        ).order_by('-deal')
+        products = self.get_queryset().order_by('-deal')
         page = self.paginate_queryset(products)
         if page is not None:
             serializer = ProductSerializer(page, many=True)
