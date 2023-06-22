@@ -11,17 +11,26 @@ from django.utils.text import slugify
 
 from datetime import date
 from decimal import Decimal
+from django.db.models import Case, When, F, IntegerField
 
 
 class ProductManager(models.Manager):
 
     def get_queryset(self):
+
         return super().get_queryset().select_related(
             'vendor',
             'category'
         ).prefetch_related(
             'price_history',
             'images'
+        ).annotate(
+            deal=Case(
+                When(sale_price__isnull=True, then=0),
+                default=100 - (F('sale_price') / F('price') * 100),
+                output_field=IntegerField()
+
+            )
         )
 
     def create_or_update(self, **kwargs):
