@@ -10,18 +10,14 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('favorite', '0001_initial'),
+        ('notification', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='favorite',
+            model_name='notification',
             name='user',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
-        ),
-        migrations.AlterUniqueTogether(
-            name='favorite',
-            unique_together={('user', 'product')},
         ),
     ]
