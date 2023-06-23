@@ -7,11 +7,10 @@ from product.models.category import Category
 from product.models.vendor import Vendor
 # utils
 from django.utils.text import slugify
-# from django.utils.translation import gettext_lazy as _
-
 from datetime import date
 from decimal import Decimal
 from django.db.models import Case, When, F, IntegerField
+from django.utils.timezone import now
 
 
 class ProductManager(models.Manager):
@@ -100,6 +99,7 @@ class Product(models.Model):
     views = models.PositiveIntegerField(default=0)
     reviews = models.PositiveIntegerField(default=0)
     search_vector = SearchVectorField(null=True, blank=True)
+    updated_at = models.DateTimeField(default=now)
 
     objects = ProductManager()
 

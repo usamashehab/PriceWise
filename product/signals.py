@@ -6,43 +6,8 @@ from django.dispatch import Signal
 from favorite.models import Favorite
 from django.conf import settings
 from notification.models import Notification
-
-# @receiver(post_save, sender=Product)
-# def product_post_save(sender, instance, **kwargs):
-#     # Update desired_price_reached for related Favorite instances
-#     favorites_1 = Favorite.objects.filter(
-#         notify_when_any_drop=False, product=instance, desired_price__gte=instance.price)
-#     favorites_1.update(notify=True)
-
-#     favorites_2 = Favorite.objects.filter(
-#         notify_when_any_drop=True, product=instance, last_notified_price__gte=instance.price)
-#     favorites_2.update(notify=True, last_notified_price=instance.price)
-
-#     favorites = favorites_1 | favorites_2
-
-#     notifications = list()
-#     # Send email to users
-#     emails = list()
-#     for favorite in favorites:
-#         user = favorite.user
-#         emails.append(user.email)
-
-#         notification_title = f'Price of {instance.name} has dropped to {instance.price} harry up and buy it'
-#         notification = Notification(
-#             user=user, favorite=favorite, title=notification_title)
-#         notifications.append(notification)
-
-#     Notification.objects.bulk_create(notifications)
-
-#     send_mail(
-#         subject='Price Alert',
-#         message=f'Price of {instance.name} has dropped to {instance.price} harry up and buy it',
-#         from_email=settings.EMAIL_HOST_USER,
-#         recipient_list=emails,
-#         fail_silently=False,
-#     )
+from django.utils import timezone
 from django.core.mail import EmailMessage
-from django.db.models import Q
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 
@@ -112,4 +77,5 @@ product_retrieved = Signal()
 def increase_product_views(sender, **kwargs):
     instance = kwargs.get('instance')
     instance.views += 1
+    instance.updated_at = timezone.now()
     instance.save()
