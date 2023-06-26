@@ -64,10 +64,11 @@ class ProductSerializer(serializers.ModelSerializer):
     images = ImageSerializer(read_only=True, many=True)
     category = serializers.SerializerMethodField(
         'get_category_name', read_only=True)
+    coupon = serializers.SerializerMethodField('get_coupon', read_only=True)
 
     class Meta:
         model = Product
-        exclude = ('search_vector',)
+        exclude = ('search_vector', 'updated_at')
 
     def get_vendor_name(self, obj):
         return obj.vendor.name
@@ -75,6 +76,14 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_category_name(self, obj):
         return obj.category.name
 
+    def get_coupon(self, obj):
+        coupon = obj.coupons.filter(active=True).first()
+        if coupon:
+            data = {
+                "id": coupon.id,
+                "code": coupon.code,
+                "discount": coupon.discount,
+            }
+            return data
 
-class DealSerializer(serializers.Serializer):
-    category = serializers.IntegerField(required=False)
+        return None

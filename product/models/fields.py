@@ -33,9 +33,7 @@ class Display(models.Model):
     class Meta:
         abstract = True
 
-    class Meta:
-        abstract = True
-
+  
 
 class Processor(models.Model):
     cpu_brand = models.CharField(max_length=100, null=True)

@@ -22,12 +22,14 @@ class ProductManager(models.Manager):
             'category'
         ).prefetch_related(
             'price_history',
-            'images'
+            'images',
+            'coupons'
         ).annotate(
             deal=Case(
                 When(sale_price__isnull=True, then=0),
                 default=100 - (F('sale_price') / F('price') * 100),
                 output_field=IntegerField()
+
 
             )
         )
@@ -36,7 +38,7 @@ class ProductManager(models.Manager):
         uid = kwargs.pop('uid')
         category = Category.objects.get(name=kwargs.pop('category'))
         vendor = Vendor.objects.get(name=kwargs.pop('vendor'))
-        #  should pass Category and Vendor as An object
+        #  should pass Category and Vendor as An object or their id
         product, created = Product.objects.get_or_create(uid=uid,
                                                          vendor=vendor, category=category,
                                                          defaults=kwargs)
@@ -77,7 +79,12 @@ class Product(models.Model):
     title = models.CharField(max_length=255)
     url = models.URLField()
     description = models.TextField(null=True)
-    slug = models.SlugField(max_length=255, unique=True, null=True, blank=True)
+    slug = models.SlugField(
+        max_length=255,
+        unique=True,
+        null=True,
+        blank=True
+    )
     brand = models.CharField(max_length=50, null=True)
     vendor = models.ForeignKey(
         "product.Vendor",
@@ -95,7 +102,12 @@ class Product(models.Model):
         max_digits=8, decimal_places=2, null=True, blank=True)
     uid = models.CharField(max_length=255)
     rating = models.DecimalField(
-        max_digits=4, decimal_places=2, default=0.00, null=True, blank=True)
+        max_digits=4,
+        decimal_places=2,
+        default=0.00,
+        null=True,
+        blank=True
+    )
     views = models.PositiveIntegerField(default=0)
     reviews = models.PositiveIntegerField(default=0)
     search_vector = SearchVectorField(null=True, blank=True)

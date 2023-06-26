@@ -1,5 +1,5 @@
 from rest_framework import viewsets, mixins
-from ..serializers import ProductSerializer, DealSerializer
+from ..serializers import ProductSerializer
 from ..models import Product, Vendor
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
 from django.db.models import F, Q
@@ -22,10 +22,6 @@ class ProductView(viewsets.GenericViewSet,
         slug = self.kwargs.get('slug')
         return self.queryset.filter(slug=slug).first()
 
-    def get_serializer_class(self):
-        if self.action == 'deals':
-            return DealSerializer
-        return super().get_serializer_class()
     # get the product object
 
     def retrieve(self, request, *args, **kwargs):
@@ -42,7 +38,9 @@ class ProductView(viewsets.GenericViewSet,
                 similar_product = vendor.products.annotate(
                     similarity=TrigramSimilarity('title', product.title),
                     rank=SearchRank(F('search_vector'), search_query)
-                ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.1)).order_by('-similarity', "-rank", "sale_price", "price").first()
+                ).filter(Q(search_vector=search_query) | Q(similarity__gt=0.1)).\
+                    order_by('-similarity', "-rank",
+                             "sale_price", "price").first()
                 if similar_product:
                     similar_product_other_vendor.append(similar_product)
 

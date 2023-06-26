@@ -12,7 +12,7 @@ class Coupon(models.Model):
     active = models.BooleanField(default=True)
     created = models.DateTimeField(default=now)
     product = models.ForeignKey(
-        'product.Product', null=True, blank=True, on_delete=models.CASCADE)
+        'product.Product', null=True, blank=True, on_delete=models.CASCADE, related_name='coupons')
     vendor = models.ForeignKey('product.Vendor', on_delete=models.CASCADE)
     url = models.URLField(max_length=200, blank=True, null=True)
 
