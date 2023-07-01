@@ -19,7 +19,10 @@ class ProductManager(models.Manager):
 
         return super().get_queryset().select_related(
             'vendor',
-            'category'
+            'category',
+            'mobile',
+            'laptop',
+            'tv',
         ).prefetch_related(
             'price_history',
             'images',

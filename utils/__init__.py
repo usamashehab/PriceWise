@@ -43,27 +43,27 @@ model = {
 }
 
 
-def get_filter_attrs(category_name, products):
-    cache_key = f"filtered_attrs_{category_name}"
+def get_filter_attrs(category_name, products, search=None):
+    cache_key = f"search_{search}_filter_attrs"
     model_lower_name = category_name.lower()
-    attrs_dict = {}
+    attrs_dict = cache.get(cache_key)
+    if not attrs_dict:
+        attrs_dict = {}
+        for key in filter_attrs[category_name]:
+            query_params = {f"{key}__isnull": False}
+            attrs = model[category_name].objects.filter(**query_params, product__in=products).values(
+                key).annotate(count=Count(key)).order_by(key).values_list(key, 'count')
 
-    for key in filter_attrs[category_name]:
-        query_params = {f"{key}__isnull": False}
-        attrs = model[category_name].objects.filter(**query_params, product__in=products).values(
-            key).annotate(count=Count(key)).order_by(key).values_list(key, 'count')
+            if attrs:
+                attrs_dict[f"{model_lower_name}__{key}"] = attrs
 
-        if attrs:
-            attrs_dict[f"{model_lower_name}__{key}"] = attrs
-
-    attrs_dict['category'] = get_categories(products)
-    attrs_dict['brand'] = get_brands(products)
-    cache.set(cache_key, attrs_dict, timeout=60*60*24)
+        attrs_dict['category'] = get_categories()
+        attrs_dict['brand'] = get_brands(products)
+    cache.set(cache_key, attrs_dict, timeout=60*3)
     return attrs_dict
 
 
-def get_categories(products):
-    categories = products.values_list('category__name', 'category__id')
+def get_categories():
     categories = Category.objects.all().values_list('id', 'name')
     return categories
 
@@ -71,5 +71,4 @@ def get_categories(products):
 def get_brands(products):
     brands = products.values('brand').annotate(count=Count(
         'brand')).order_by('brand').values_list('brand', 'count')
-
     return brands
