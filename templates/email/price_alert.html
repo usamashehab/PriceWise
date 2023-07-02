@@ -1,87 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Price Alert</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            color: #333;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        color: #333;
+      }
 
-        h1, h2 {
-            color: #0066cc;
-        }
+      h1,
+      h2 {
+        color: #0066cc;
+      }
 
-        p {
-            margin: 10px 0;
-        }
+      p {
+        margin: 10px 0;
+        color: #000000 !important;
+      }
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f7f7f7;
-            border-radius: 5px;
-        }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f7f7f7;
+        border-radius: 5px;
+      }
 
-        .logo {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+      .logo {
+        text-align: center;
+        margin-bottom: 20px;
+      }
 
-        .product-name {
-            font-size: 20px;
-            font-weight: bold;
-        }
+      .product-name {
+        font-size: 20px;
+        font-weight: bold;
+      }
 
-        .product-link {
-            text-decoration: none;
-            color: #0066cc;
-        }
+      .product-link {
+        text-decoration: none;
+        color: #0066cc;
+      }
 
-        .price {
-            font-size: 18px;
-            color: #009900;
-        }
+      .price {
+        font-size: 18px;
+        color: #009900;
+      }
 
-        .cta-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #0066cc;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
+      .cta-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #0066cc;
+        color: #fff !important;
+        text-decoration: none;
+        border-radius: 5px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="logo">
-            <img src="path/to/your/logo.png" alt="Your Website Logo">
-        </div>
-        <h1>Price Alert</h1>
-        <p>Dear User,</p>
-        <p>We would like to inform you that the price of the following product has dropped:</p>
+      <div class="logo">
+        <img src="https://svgshare.com/i/uqq.svg" title="" />
+      </div>
+      <h1>Price Alert</h1>
+      <p>Dear User,</p>
+      <p>
+        We would like to inform you that the price of the following product has
+        dropped:
+      </p>
 
-        <h2 class="product-name">
-            <a class="product-link" href="{{ jj }}">{{ product.title }}</a>
-        </h2>
+      <h2 class="product-name">
+        <a class="product-link" href="{{ jj }}">{{ product.title }}</a>
+      </h2>
 
-        <p>The current price is now <span class="price">{{ product.price }}</span>.</p>
+      <p>
+        The current price is now <span class="price">{{ product.price }}</span>.
+      </p>
 
-        <p>Take advantage of this offer and make your purchase today!</p>
+      <p>Take advantage of this offer and make your purchase today!</p>
 
-        <p>Best regards,</p>
-        <p>Your Website Team</p>
+      <p>Best regards,</p>
+      <p>Your Website Team</p>
 
-        <p>
-            If you have any questions, please don't hesitate to <a href="mailto:contact@example.com">contact us</a>.
-        </p>
-        <p>
-            <a class="cta-button" href="https://www.example.com">Visit Our Website</a>
-        </p>
+      <p>
+        If you have any questions, please don't hesitate to
+        <a href="mailto:contact@example.com">contact us</a>.
+      </p>
+      <p>
+        <a class="cta-button" href="http://localhost:3000/"
+          >Visit Our Website</a
+        >
+      </p>
     </div>
-</body>
+  </body>
 </html>
