@@ -43,23 +43,21 @@ model = {
 }
 
 
-def get_filter_attrs(category_name, products, search=None, products_to_get_brands=None):
-    cache_key = f"search_{search}_filter_attrs"
+def get_filter_attrs(category_name, products, search=None):
     model_lower_name = category_name.lower()
-    attrs_dict = cache.get(cache_key)
+    attrs_dict = {}
     if not attrs_dict:
-        attrs_dict = {}
         for key in filter_attrs[category_name]:
             query_params = {f"{key}__isnull": False}
             attrs = model[category_name].objects.filter(**query_params, product__in=products).values(
                 key).annotate(count=Count(key)).order_by(key).values_list(key, 'count')
 
+            print(attrs)
             if attrs:
                 attrs_dict[f"{model_lower_name}__{key}"] = attrs
 
         attrs_dict['category'] = get_categories()
-        attrs_dict['brand'] = get_brands(products_to_get_brands)
-    cache.set(cache_key, attrs_dict, timeout=60*3)
+        attrs_dict['brand'] = get_brands(products)
     return attrs_dict
 
 
@@ -69,6 +67,6 @@ def get_categories():
 
 
 def get_brands(products):
-    brands = products.values('brand').annotate(count=Count(
-        'brand')).order_by('brand').values_list('brand', 'count')
+
+    brands = {product.brand for product in products if product.brand is not None}
     return brands

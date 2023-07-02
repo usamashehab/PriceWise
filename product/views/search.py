@@ -16,7 +16,7 @@ class SearchView(viewsets.GenericViewSet):
     queryset = Product.objects.all()
     serializer_class = SearchSerializer
 
-    @query_debugger
+    # @query_debugger
     @action(methods=['post'], detail=False, url_path='products/(?P<search>[^/]+)')
     def search(self, request, search):
         search_query = SearchQuery(search)
@@ -27,14 +27,12 @@ class SearchView(viewsets.GenericViewSet):
 
         sort = request.data.get('sort_by', None)
         sort_keyword = self.get_sort_keyword(sort)
-        cache_key = f'search_{search}_products'
         # products = cache.get(cache_key)
         # if not products:
         products, products_to_analyze = self.get_filterd_products(
             search, search_query, min_price, max_price, filters, sort_keyword)
 
         products_to_analyze = products_to_analyze[:50]
-        cache.set(cache_key, products, 60*3)
 
         category = products.values('category__name').annotate(
             count=Count('category')).order_by('-count').first()
@@ -42,7 +40,7 @@ class SearchView(viewsets.GenericViewSet):
         if category:
             category_name = category.get('category__name')
             filter_attrs = get_filter_attrs(
-                category_name, products_to_analyze, search, products)
+                category_name, products_to_analyze, search)
         page = self.paginate_queryset(products)
 
         prices = products.aggregate(
