@@ -23,10 +23,11 @@ class ProductManager(models.Manager):
             'mobile',
             'laptop',
             'tv',
+            'tablet',
         ).prefetch_related(
+            'coupons',
             'price_history',
             'images',
-            'coupons'
         ).annotate(
             deal=Case(
                 When(sale_price__isnull=True, then=0),
@@ -35,7 +36,7 @@ class ProductManager(models.Manager):
 
 
             )
-        )
+        ).filter(images__isnull=False).distinct()
 
     def create_or_update(self, **kwargs):
         uid = kwargs.pop('uid')

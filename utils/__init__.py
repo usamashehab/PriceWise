@@ -17,9 +17,9 @@ common_attrs = [
     "operating_system",
 ]
 filter_attrs = {
-    "Mobile": common_attrs,
-    "Laptop": common_attrs,
-    "TV": [
+    "Mobiles": common_attrs,
+    "Laptops": common_attrs,
+    "TVs": [
         "display_size",
         "display_type",
         "refresh_rate",
@@ -27,7 +27,7 @@ filter_attrs = {
 
 
     ],
-    "Tablet": common_attrs,
+    "Tablets": common_attrs,
     "General": [
         "name",
 
@@ -36,10 +36,10 @@ filter_attrs = {
 
 
 model = {
-    "Mobile": Mobile,
-    "Laptop": Laptop,
-    "TV": TV,
-    "Tablet": Tablet,
+    "Mobiles": Mobile,
+    "Laptops": Laptop,
+    "TVs": TV,
+    "Tablets": Tablet,
 }
 
 
