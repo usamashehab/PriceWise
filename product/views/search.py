@@ -16,6 +16,7 @@ class SearchView(viewsets.GenericViewSet):
     queryset = Product.objects.all()
     serializer_class = SearchSerializer
 
+    @query_debugger
     @action(methods=['post'], detail=False, url_path='products/(?P<search>[^/]+)')
     def search(self, request, search):
         search_query = SearchQuery(search)
@@ -27,21 +28,12 @@ class SearchView(viewsets.GenericViewSet):
         sort = request.data.get('sort_by', None)
         sort_keyword = self.get_sort_keyword(sort)
         cache_key = f'search_{search}_products'
-        products = cache.get(cache_key)
-        if not products:
-            products = Product.objects.annotate(
-                similarity=TrigramSimilarity('title', search),
-                rank=SearchRank(F('search_vector'), search_query)
-            ).filter(
-                Q(search_vector=search_query) |
-                Q(similarity__gt=0.1) |
-                Q(title__icontains=search),
-                Q(price__range=(min_price, max_price)),
-                *filters
-            ).order_by(
-                *sort_keyword
-            )
+        # products = cache.get(cache_key)
+        # if not products:
+        products, products_to_analyze = self.get_filterd_products(
+            search, search_query, min_price, max_price, filters, sort_keyword)
 
+        products_to_analyze = products_to_analyze[:50]
         cache.set(cache_key, products, 60*3)
 
         category = products.values('category__name').annotate(
@@ -50,7 +42,7 @@ class SearchView(viewsets.GenericViewSet):
         if category:
             category_name = category.get('category__name')
             filter_attrs = get_filter_attrs(
-                category_name, products, search)
+                category_name, products_to_analyze, search, products)
         page = self.paginate_queryset(products)
 
         prices = products.aggregate(
@@ -87,3 +79,23 @@ class SearchView(viewsets.GenericViewSet):
             args = [keywords.get(keyword)] + args
 
         return args
+
+    def get_filterd_products(self, search, search_query, min_price, max_price, filters, sort_keyword):
+
+        product_querysets = []
+        for _ in range(2):
+            products = Product.objects.annotate(
+                similarity=TrigramSimilarity('title', search),
+                rank=SearchRank(F('search_vector'), search_query)
+            ).filter(
+                Q(search_vector=search_query) |
+                Q(similarity__gt=0.5) |
+                Q(title__icontains=search),
+                Q(price__range=(min_price, max_price)),
+                *filters
+            ).order_by(
+                *sort_keyword
+            )
+            product_querysets.append(products)
+
+        return product_querysets

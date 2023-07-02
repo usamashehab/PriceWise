@@ -43,7 +43,7 @@ model = {
 }
 
 
-def get_filter_attrs(category_name, products, search=None):
+def get_filter_attrs(category_name, products, search=None, products_to_get_brands=None):
     cache_key = f"search_{search}_filter_attrs"
     model_lower_name = category_name.lower()
     attrs_dict = cache.get(cache_key)
@@ -58,7 +58,7 @@ def get_filter_attrs(category_name, products, search=None):
                 attrs_dict[f"{model_lower_name}__{key}"] = attrs
 
         attrs_dict['category'] = get_categories()
-        attrs_dict['brand'] = get_brands(products)
+        attrs_dict['brand'] = get_brands(products_to_get_brands)
     cache.set(cache_key, attrs_dict, timeout=60*3)
     return attrs_dict
 
