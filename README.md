@@ -64,4 +64,4 @@ $ python manage.py migrate
 $ python manage.py runserver
 ```
 
-6. Open a web browser and navigate to `http://localhost:8000` to access the application.
+6. Open a web browser and navigate to `http://localhost:8000/redoc/` to access the APIs documentation.
