@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.dispatch import receiver
 from django.template.loader import render_to_string
+from django.db.models import Q
 
 
 @receiver(post_save, sender=Product)
@@ -36,9 +37,21 @@ def update_desired_price_reached(instance):
 
 def get_matching_favorites(instance):
     favorites_1 = Favorite.objects.filter(
-        notify_when_any_drop=False, product=instance, desired_price__gte=instance.price)
+        Q(notify_when_any_drop=False)
+        & Q(product=instance)
+        & (
+            Q(desired_price__gte=instance.price)
+            | Q(desired_price__gte=instance.sale_price)
+        )
+    )
     favorites_2 = Favorite.objects.filter(
-        notify_when_any_drop=True, product=instance, last_notified_price__gte=instance.price)
+        Q(notify_when_any_drop=True)
+        & Q(product=instance)
+        & (
+            Q(desired_price__gte=instance.price)
+            | Q(desired_price__gte=instance.sale_price)
+        )
+    )
     return favorites_1 | favorites_2
 
 
