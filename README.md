@@ -93,9 +93,7 @@ Check out our video, "Building a Price Comparison Website with Django, DRF, Post
 [![PriceWise Video](demo.mp4)](demo.mp4)
 
 ## Frontend Repository
+Frontend were done by @ahmedRadwan10 and @mohamedsamirr9 but unfortunately they prefer to keep they repo private
 
-For more details on our frontend development and design, visit the frontend repository at [https://github.com/[Frontend Developer's Name]/PriceWise-Frontend](https://github.com/[Frontend Developer's Name]/PriceWise-Frontend).
-
-Experience the convenience and efficiency of PriceWise and elevate your shopping experience today! Happy shopping with PriceWise! 🛍️💰
 
 > Note: As this is a personal project to showcase my backend engineering skills, the video and frontend repository are for demonstration purposes only and may not be functional or actively maintained.
