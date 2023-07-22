@@ -90,7 +90,7 @@ PriceWise offers a variety of cutting-edge features that enhance your shopping e
 
 Check out our video, "Building a Price Comparison Website with Django, DRF, PostgreSQL, and Redis: A Technical Journey," for an in-depth look at the development process, tech stack, and key features of PriceWise. Learn how our team of dedicated backend engineers, web scrapers, and frontend developers collaborated to create a powerful and user-friendly price comparison platform.
 
-[![PriceWise Video](demo.mp4)](demo.mp4)
+Click [here](https://www.youtube.com/watch?v=mLfHl-fCl-k) to view the demo of PriceWise.
 
 ## Frontend Repository
 Frontend were done by @ahmedRadwan10 and @mohamedsamirr9 but unfortunately they prefer to keep they repo private
