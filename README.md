@@ -1,6 +1,6 @@
 # PriceWise: A Price Comparison Website
 
-Welcome to PriceWise, a powerful and user-friendly price comparison website developed by a team of skilled professionals. This project showcases the collaboration between talented backend engineers, web scrapers, and frontend developers, resulting in a dynamic and feature-rich platform.
+Welcome to PriceWise, a powerful and user-friendly price comparison website.
 
 ## Installation
 
